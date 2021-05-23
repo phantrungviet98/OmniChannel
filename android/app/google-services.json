@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "134452787160",
+    "project_id": "omnichannel-41da7",
+    "storage_bucket": "omnichannel-41da7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134452787160:android:c5c84e3395a546b67aa4ad",
+        "android_client_info": {
+          "package_name": "vn.omnichannel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "134452787160-fhj2maqkepd017hks7if9bsd2b487rrb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4zhT9tuK6ZERXhyeSKlqnLTVLltqxIcE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "134452787160-fhj2maqkepd017hks7if9bsd2b487rrb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
