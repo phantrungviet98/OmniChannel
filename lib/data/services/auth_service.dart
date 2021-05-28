@@ -12,6 +12,7 @@ class AuthService {
           variables: {"username": username, "password": password}));
       return LoginResponse.fromJson(result.data['auth']['login']);
     } catch (e) {
+      print(e);
       throw ServerException();
     }
   }

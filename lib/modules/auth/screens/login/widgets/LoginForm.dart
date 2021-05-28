@@ -41,6 +41,8 @@ class _LoginFormState extends State<LoginForm> {
                   loading: state is LoginStateLoading,
                   title: 'Đăng nhập',
                   onPressed: () {
+                    // Navigator.pushNamedAndRemoveUntil(context, '/home', ModalRoute.withName('/'));
+                    // return;
                     BlocProvider.of<LoginBloc>(context).add(LoginEventSubmitted(
                         username: _usernameController.text,
                         password: _passwordController.text));

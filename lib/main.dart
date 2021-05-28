@@ -3,19 +3,23 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Account/AccountBloc.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Login/LoginBloc.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
-import 'package:omnichannel_flutter/config/client.dart';
 import 'package:omnichannel_flutter/modules/auth/screens/login/main.dart';
 import 'package:omnichannel_flutter/modules/auth/screens/onBoard/main.dart';
 import 'package:omnichannel_flutter/modules/auth/screens/signUp/main.dart';
 import 'package:omnichannel_flutter/modules/home/screens/main.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/Product/ProductBloc.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/Category/CategoryBloc.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/CreateCate/CreateCateBloc.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/GetAllProduct/GetAllProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/screens/CreateProduct/main.dart';
+import 'package:omnichannel_flutter/modules/product/screens/ProductDescription/main.dart';
+import 'package:omnichannel_flutter/modules/product/screens/ProductManagement/main.dart';
+import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/SelectCategory/main.dart';
 import 'package:omnichannel_flutter/modules/splash/screens/splash/main.dart';
+import 'package:page_transition/page_transition.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -48,38 +52,49 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final _authClient = AuthServiceConfigs.initializeClient();
-  final _posClient = PosServiceConfigs.initializeClient();
 
   @override
   Widget build(BuildContext context) {
-    return GraphQLProvider(
-      client: _posClient,
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AccountBloc>(create: (context) => AccountBloc()),
-          BlocProvider<LoginBloc>(
-              create: (context) => LoginBloc(
-                  accountBloc: BlocProvider.of<AccountBloc>(context))),
-          BlocProvider<ProductBloc>(create: (context) => ProductBloc())
-
-        ],
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: AppTheme,
-          ),
-          initialRoute: '/',
-          routes: {
-            '/': (context) => SplashScreen(),
-            '/on-board': (context) => OnBoardScreen(),
-            '/login': (context) => LoginScreen(),
-            '/sign-up': (context) => SignUpScreen(),
-            '/home': (context) => Home(),
-            '/create-product': (context) => CreateProductScreen(),
-            '/select-category': (context) => SelectCategoryScreen(),
-          },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AccountBloc>(create: (context) => AccountBloc()),
+        BlocProvider<LoginBloc>(
+            create: (context) =>
+                LoginBloc(accountBloc: BlocProvider.of<AccountBloc>(context))),
+        BlocProvider(create: (context) => CategoryBloc()),
+        BlocProvider<CreateCateBloc>(
+            create: (context) => CreateCateBloc(
+                categoryBloc: BlocProvider.of<CategoryBloc>(context))),
+        BlocProvider<GetAllProductBloc>(create: (context) => GetAllProductBloc()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: AppTheme,
         ),
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/product-description':
+              return PageTransition(child: ProductDescription(), type: PageTransitionType.bottomToTop, settings: settings,);
+              break;
+            case '/product-properties':
+              return PageTransition(child: ProductProperties(), type: PageTransitionType.bottomToTop, settings: settings);
+              break;
+            default:
+              return null;
+          }
+        },
+        initialRoute: '/',
+        routes: {
+          '/': (context) => SplashScreen(),
+          '/on-board': (context) => OnBoardScreen(),
+          '/login': (context) => LoginScreen(),
+          '/sign-up': (context) => SignUpScreen(),
+          '/home': (context) => Home(),
+          '/create-product': (context) => CreateProductScreen(),
+          '/select-category': (context) => SelectCategoryScreen(),
+          '/product-management': (context) => ProductManagementScreen(),
+        },
       ),
     );
   }

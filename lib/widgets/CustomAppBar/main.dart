@@ -5,9 +5,10 @@ class CustomAppBar extends AppBar with PreferredSizeWidget {
   @override
   get preferredSize => Size.fromHeight(50);
 
-  CustomAppBar({Key key, String title, Color backgroundColor, List<Widget> actions})
+  CustomAppBar({Key key, String title, Color backgroundColor, List<Widget> actions, leading})
       : super(
             key: key,
+            leading: leading,
             title: Text(
               title,
               style: TextStyle(color: Colors.white),

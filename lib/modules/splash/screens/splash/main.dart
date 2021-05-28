@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,17 @@ class _LoadingState extends State<Loading> {
 
   Future _init() async {
     await Firebase.initializeApp();
-    await FirebaseMessaging.instance.subscribeToTopic('all');
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    await messaging.subscribeToTopic('all');
+    final token = await messaging.getToken();
+    log('Firebase token:' + token);
+
+    FirebaseMessaging.onMessage.listen((event) {
+      print('FirebaseMessaging.onMessage: ' + event.data.toString());
+    });
+
+    final message = messaging.getInitialMessage();
+    log('getInitialMessage' + message.toString());
     Navigator.pushReplacementNamed(context, '/on-board');
   }
 

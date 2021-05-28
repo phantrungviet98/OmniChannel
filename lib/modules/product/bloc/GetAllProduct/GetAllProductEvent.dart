@@ -1,0 +1,3 @@
+class GetAllProductEvent {
+  const GetAllProductEvent();
+}

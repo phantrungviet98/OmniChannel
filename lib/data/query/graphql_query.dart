@@ -38,4 +38,23 @@ class GraphQLQuery {
       }
     }
   """;
+
+  static const getAllProducts = """
+    query {
+      product {
+        products {
+          id
+          photos {
+            url
+          }
+          name
+          price
+          stockData {
+            total
+          }
+          date_created
+        }
+      }
+    }
+  """;
 }

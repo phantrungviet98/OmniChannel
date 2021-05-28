@@ -109,15 +109,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value) => print('Firebase token:' + value));
-    FirebaseMessaging.onMessage.listen((event) {
-      print('event data' + event.data.toString());
-    });
-
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((value) => print('getInitialMessage' + value.toString()));
   }
 
   @override

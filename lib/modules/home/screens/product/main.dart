@@ -37,7 +37,7 @@ class ProductScreen extends BaseScreen {
                   OptionItem(
                     icon: Icon(Icons.list_alt),
                     title: 'Quản lý sản phẩm',
-                    onPressed: () {},
+                    onPressed: () => Navigator.pushNamed(context, '/product-management'),
                   )
                 ],
               );

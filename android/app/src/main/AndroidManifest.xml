@@ -2,6 +2,7 @@
     package="vn.omnichannel">
    <application
        android:label="omnichannel_flutter"
+       android:requestLegacyExternalStorage="true"
        android:showWhenLocked="true"
        android:turnScreenOn="true"
        android:icon="@mipmap/ic_launcher">

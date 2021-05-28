@@ -17,7 +17,7 @@ class OptionItem extends StatelessWidget {
             padding: MaterialStateProperty.resolveWith(
                 (states) => EdgeInsets.all(12)),
             backgroundColor: MaterialStateProperty.all(Colors.white)),
-        onPressed: () {},
+        onPressed: this.onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
