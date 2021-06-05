@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ffi';
 
+import 'package:equatable/equatable.dart';
 import 'package:omnichannel_flutter/utis/number.dart';
 
 class Product {
@@ -238,7 +239,7 @@ class Variants {
   }
 }
 
-class Attributes {
+class Attributes extends Equatable {
   String name;
   String value;
 
@@ -255,6 +256,11 @@ class Attributes {
     data['value'] = this.value;
     return data;
   }
+
+  @override
+  List<Object> get props => [name, value];
+
+
 }
 
 class FeaturedPhoto {

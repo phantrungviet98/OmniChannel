@@ -1,5 +1,6 @@
 import 'package:either_option/either_option.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
 import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 import 'package:omnichannel_flutter/data/modals/LoginResponse.dart';
 import 'package:omnichannel_flutter/data/modals/ManagementProductResponse.dart';
@@ -46,6 +47,15 @@ class RemoteRepository {
       return Right(data);
     } on ServerException catch (e) {
       print(e);
+      return Left(ServerFailure());
+    }
+  }
+
+  static Future<Either<Failure, bool>>createProduct(CreateOneProductInput input) async {
+    try {
+      await PosService.createProduct(input);
+      return Right(true);
+    } on ServerException catch (e) {
       return Left(ServerFailure());
     }
   }

@@ -38,6 +38,9 @@ class _State extends State<ImagePicker> {
       setState(() {
         loading = false;
       });
+
+      log('imageUrl' + imageUrl);
+
       widget.onNewImagePickedAndUploaded(imageUrl);
     } else {
       showSnackBar(context, text: 'Có lỗi xảy ra khi lưu trữ ảnh');

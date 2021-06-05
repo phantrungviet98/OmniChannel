@@ -57,4 +57,16 @@ class GraphQLQuery {
       }
     }
   """;
+
+  static const createProduct = """
+    mutation(\$record: CreateOneProductInput!) {
+      product {
+        createProduct(record: \$record) {
+           record {
+              name
+           }
+        }
+      }
+    }
+  """;
 }

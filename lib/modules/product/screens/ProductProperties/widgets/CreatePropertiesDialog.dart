@@ -41,6 +41,27 @@ class _State extends State<CreatePropertiesDialog> {
   String _nameErrorText = '';
   String _valueErrorText = '';
 
+  _onPressAddValue() {
+    if (_valueInputController.text.isEmpty) {
+      this.setState(() {
+        _valueErrorText = 'Bạn cần phải nhập giá trị cho thuộc tính';
+      });
+    } else if (_props.any((element) =>
+    element.value == _valueInputController.text)) {
+      this.setState(() {
+        _valueErrorText = 'Bạn cần nhập 1 giá trị khác';
+      });
+    } else {
+      setState(() {
+        _props.add(ProductModal.Attributes(
+            name: _name,
+            value: _valueInputController.text));
+      });
+      _valueInputController.text = '';
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -150,7 +171,7 @@ class _State extends State<CreatePropertiesDialog> {
                             });
                           }
                         },
-                        onSaved: (String value) {},
+                        onFieldSubmitted: (text) => _onPressAddValue(),
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 16),
@@ -158,25 +179,7 @@ class _State extends State<CreatePropertiesDialog> {
                           style:
                               ElevatedButton.styleFrom(shape: CircleBorder()),
                           child: Icon(Icons.add, color: Colors.white),
-                          onPressed: () {
-                            if (_valueInputController.text.isEmpty) {
-                              this.setState(() {
-                                _valueErrorText = 'Bạn cần phải nhập giá trị cho thuộc tính';
-                              });
-                            } else if (_props.any((element) =>
-                                element.value == _valueInputController.text)) {
-                              this.setState(() {
-                                _valueErrorText = 'Bạn cần nhập 1 giá trị khác';
-                              });
-                            } else {
-                              setState(() {
-                                _props.add(ProductModal.Attributes(
-                                    name: _name,
-                                    value: _valueInputController.text));
-                              });
-                              _valueInputController.text = '';
-                            }
-                          },
+                          onPressed: _onPressAddValue,
                         ),
                       ),
                       Tags(

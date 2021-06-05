@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/screens/CreateProduct/widgets/OneFieldLine.dart';
 
 class TagsPicker extends StatelessWidget {
@@ -13,6 +17,7 @@ class TagsPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log(BlocProvider.of<CreateProductBloc>(context).state.createProductInput.toString());
     return Column(
       children: [
         OneFieldLine(

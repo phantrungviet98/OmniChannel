@@ -12,6 +12,7 @@ import 'package:omnichannel_flutter/modules/auth/screens/signUp/main.dart';
 import 'package:omnichannel_flutter/modules/home/screens/main.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/Category/CategoryBloc.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/CreateCate/CreateCateBloc.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/GetAllProduct/GetAllProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/screens/CreateProduct/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductDescription/main.dart';
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
             create: (context) => CreateCateBloc(
                 categoryBloc: BlocProvider.of<CategoryBloc>(context))),
         BlocProvider<GetAllProductBloc>(create: (context) => GetAllProductBloc()),
+        BlocProvider<CreateProductBloc>(create: (context) => CreateProductBloc()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

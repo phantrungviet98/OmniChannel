@@ -1,8 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class OneFieldLine extends StatelessWidget {
-  OneFieldLine(
+class OneFieldLine extends StatefulWidget {
+  const OneFieldLine(
       {this.hint, this.onChanged, this.onSubmitted, this.isClearOnSubmit = false});
 
   final String hint;
@@ -10,6 +12,13 @@ class OneFieldLine extends StatelessWidget {
   final Function(String) onSubmitted;
   final bool isClearOnSubmit;
 
+  @override
+  State<StatefulWidget> createState() {
+    return _State();
+  }
+}
+
+class _State extends State<OneFieldLine> {
   final _textController = TextEditingController();
 
   @override
@@ -18,13 +27,15 @@ class OneFieldLine extends StatelessWidget {
       margin: EdgeInsets.only(top: 10),
       child: TextField(
         controller: _textController,
-        decoration: InputDecoration(labelText: hint),
-        onChanged: onChanged,
+        decoration: InputDecoration(labelText: widget.hint),
+        onChanged: (text) {
+          widget.onChanged?.call(text);
+        },
         onSubmitted: (text) {
-          if (isClearOnSubmit) {
+          if (widget.isClearOnSubmit) {
             _textController.clear();
           }
-          return onSubmitted (text);
+          return widget.onSubmitted(text);
         },
       ),
     );

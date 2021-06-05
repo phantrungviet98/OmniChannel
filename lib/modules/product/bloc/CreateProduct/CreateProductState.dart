@@ -1,19 +1,19 @@
-abstract class CreateProductState {
-  const CreateProductState();
+import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
+part 'CreateProductState.g.dart';
+
+enum Status {
+  initial, loading, success, fail
 }
 
-class CreateProductStateInitial extends CreateProductState {
-  const CreateProductStateInitial();
-}
+@CopyWith()
+class CreateProductState extends Equatable {
+  const CreateProductState({@required this.createProductInput, @required this.status});
+  final CreateOneProductInput createProductInput;
+  final Status status;
 
-class CreateProductStateLoading extends CreateProductState {
-  const CreateProductStateLoading();
-}
-
-class CreateProductStateSuccess extends CreateProductState {
-  const CreateProductStateSuccess();
-}
-
-class CreateProductStateFail extends CreateProductState {
-  const CreateProductStateFail();
+  @override
+  List<Object> get props => [createProductInput, status];
 }

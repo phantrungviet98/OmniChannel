@@ -2,18 +2,33 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:omnichannel_flutter/common/ui/BaseScreen.dart';
-import 'package:omnichannel_flutter/data/modals/ManagementProductResponse.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
+import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/widgets/CreatePropertiesDialog.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/widgets/ProductPropertiesItem.dart';
+import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/widgets/PropertiesTable.dart';
 import 'package:omnichannel_flutter/widgets/CustomAppBar/main.dart';
-import 'package:trotter/trotter.dart';
+
+class ProductPropertiesDefault {
+  const ProductPropertiesDefault(
+      {this.weight, this.price, this.inPrice, this.salePrice});
+
+  final double weight;
+  final double price;
+  final double inPrice;
+  final double salePrice;
+}
+
+class ProductPropertiesChangedParams {
+  const ProductPropertiesChangedParams({this.variants, this.attributes});
+
+  final List<Variants> variants;
+  final List<ProductAttributesInput> attributes;
+}
 
 class ProductProperties extends BaseScreenStateful {
-  ProductProperties({this.onDone});
-
-  final Function(List<Attributes>) onDone;
-
   @override
   State<StatefulWidget> createState() {
     return _State();
@@ -22,59 +37,77 @@ class ProductProperties extends BaseScreenStateful {
 
 class _State extends State<ProductProperties> {
   List<Variants> _variants = [];
+  List<ProductAttributesInput> _attributes = [];
 
   _openCreateCateForm(BuildContext context) {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
+        final bloc = BlocProvider.of<CreateProductBloc>(context);
         return CreatePropertiesDialog(
           onDone: (props) {
-            final variants =
-                props.map((e) => Variants(attributes: List.from([e])));
-            setState(() {
-              _variants.addAll(variants);
-            });
+            _attributes.add(ProductAttributesInput(
+                name: props.first.name,
+                values: props.map((e) => e.value).toList()));
+            _buildVariantsFromAttributes(_attributes, ProductPropertiesDefault(
+              weight: bloc.state.createProductInput.weight,
+              price: bloc.state.createProductInput.price,
+              inPrice: bloc.state.createProductInput.inPrice,
+              salePrice: bloc.state.createProductInput.salePrice,
+            ));
           },
         );
       },
     );
   }
 
-  c(List<List<String>> a, int index) {
-    if (index == a.length) {
-      return [];
+  _buildVariantsFromAttributes(List<ProductAttributesInput> attributes,
+      ProductPropertiesDefault screenParams) {
+    List<List<ProductVariantsAttributesInput>> a = _attributes
+        .map((e) => e.values
+            .map(
+                (e1) => ProductVariantsAttributesInput(name: e.name, value: e1))
+            .toList())
+        .toList();
+    if (a.isEmpty) {
+      this.setState(() {
+        _variants = [];
+      });
+      return;
     }
 
-    log('a[index' + a[index].toString());
-    log('123123 ' + ([...c(a, index + 1)]).toString());
+    List<List<ProductVariantsAttributesInput>> _allPossibleCases =
+        allPossibleCases(a).toList();
 
-    final l = a[index].map((e) => [e, c(a, index + 1)]).toList();
-    return l;
-    // return ;
+    final variants = _allPossibleCases
+        .map((e) => Variants(
+            attributes: List.from(e),
+            weight: screenParams.weight,
+            price: screenParams.price,
+            inPrice: screenParams.inPrice,
+            salePrice: screenParams.salePrice))
+        .toList();
+
+    setState(() {
+      _variants = variants;
+    });
   }
-  // _a() {
-  //   List<List<String>> list = [];
-  //
-  //   int count = 0;
-  //
-  //   List<List<String>> a = [['S', 'M'], ['S1', 'M1'], ['S2', 'M2']];
-  //
-  //
-  //
-  //   a.forEach((e) {
-  //     List<String> s = [];
-  //     e.forEach((element) {
-  //       s.add();
-  //     });
-  //   });
+
+  Iterable<List<ProductVariantsAttributesInput>> allPossibleCases(
+      List<List<ProductVariantsAttributesInput>> list) sync* {
+    List<List<ProductVariantsAttributesInput>> cloned = List.from(list);
+    var first = cloned.removeAt(0);
+    var remainder = cloned.isNotEmpty ? allPossibleCases(cloned) : [[]];
+    for (var r in remainder) for (var h in first) yield [h, ...r];
+  }
+
+  // Iterable<List<String>> allPossibleCasesString(List<List<String>> list) sync* {
+  //   List<List<String>> cloned = List.from(list);
+  //   var first = cloned.removeAt(0);
+  //   var remainder = cloned.isNotEmpty ? allPossibleCasesString(cloned) : [[]];
+  //   for (var r in remainder) for (var h in first) yield [h, ...r];
   // }
-
-  @override
-  void initState() {
-    super.initState();
-    // _a();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +115,11 @@ class _State extends State<ProductProperties> {
       appBar: CustomAppBar(
         title: 'Thuộc tính sản phẩm',
         leading: InkWell(
-          child: Icon(Icons.close),
-          onTap: () => Navigator.pop(context),
+          child: _attributes.isNotEmpty ? Icon(Icons.check) : Icon(Icons.close),
+          onTap: () => Navigator.pop(
+              context,
+              ProductPropertiesChangedParams(
+                  attributes: _attributes, variants: _variants)),
         ),
         actions: [
           InkWell(
@@ -100,14 +136,37 @@ class _State extends State<ProductProperties> {
         ],
       ),
       body: Container(
-        child: ListView.builder(
-          itemCount: _variants.length,
-          itemBuilder: (context, index) {
-            return ProductPropertiesItem(
-              variant: _variants[index],
-            );
-          },
-        ),
+        child: this._attributes.isEmpty
+            ? Center(
+                child: Text('Sản phẩm chưa có thuộc tính nào'),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.only(left: 8, right: 8, top: 8),
+                itemCount: _variants.length,
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      index == 0
+                          ? PropertiesTable(
+                              attributes: this._attributes,
+                              onAttributeChanged: (values) {
+                                setState(() => this._attributes = values);
+                                _buildVariantsFromAttributes(
+                                    values,
+                                    ModalRoute.of(context).settings.arguments
+                                        as ProductPropertiesDefault);
+                              },
+                            )
+                          : Container(),
+                      ProductPropertiesItem(
+                        onChangeVariant: (variant) =>
+                            setState(() => _variants[index] = variant),
+                        variants: _variants[index],
+                      ),
+                    ],
+                  );
+                },
+              ),
       ),
     );
   }
