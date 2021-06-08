@@ -9,7 +9,7 @@ import "package:collection/collection.dart";
 import 'package:omnichannel_flutter/modules/home/screens/export/widget/exportItem.dart';
 
 class ExportScreen extends BaseScreenStateful {
-  static final theme = ScreenTheme(color: Colors.blueAccent, title: 'Nhập kho', icon: Icons.move_to_inbox);
+  static final theme = ScreenTheme(color: Colors.blueAccent, title: 'Xuất kho', icon: Icons.move_to_inbox);
 
   @override
   ExportScreenState createState() => ExportScreenState();
