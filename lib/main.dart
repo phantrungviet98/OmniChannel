@@ -22,6 +22,9 @@ import 'package:omnichannel_flutter/modules/product/screens/SelectCategory/main.
 import 'package:omnichannel_flutter/modules/splash/screens/splash/main.dart';
 import 'package:page_transition/page_transition.dart';
 
+import 'modules/home/screens/createExportScreen/createExportScreen.dart';
+
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
@@ -96,6 +99,9 @@ class MyApp extends StatelessWidget {
           '/create-product': (context) => CreateProductScreen(),
           '/select-category': (context) => SelectCategoryScreen(),
           '/product-management': (context) => ProductManagementScreen(),
+          '/createExport': (context) => createExportScreen(),
+          /// mình định code phần màn này nhưng thôi
+          // '/listOrderScreen':(context) => ListOrderScreen(),
         },
       ),
     );
