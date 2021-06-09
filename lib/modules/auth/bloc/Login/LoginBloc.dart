@@ -35,6 +35,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
                 accessToken: data.accessToken,
                 user: data.userData));
             PosServiceConfigs.token = data.accessToken;
+            ShippingServiceConfigs.token = data.accessToken;
             yield LoginStateSuccess();
           }
         }
