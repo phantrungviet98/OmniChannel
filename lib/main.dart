@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:omnichannel_flutter/bloc-providers.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Account/AccountBloc.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Login/LoginBloc.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
@@ -20,6 +21,7 @@ import 'package:omnichannel_flutter/modules/product/screens/ProductManagement/ma
 import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/SelectCategory/main.dart';
 import 'package:omnichannel_flutter/modules/splash/screens/splash/main.dart';
+import 'package:omnichannel_flutter/modules/stock/screens/CreateStock/main.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'modules/home/screens/createExportScreen/createExportScreen.dart';
@@ -56,22 +58,10 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider<AccountBloc>(create: (context) => AccountBloc()),
-        BlocProvider<LoginBloc>(
-            create: (context) =>
-                LoginBloc(accountBloc: BlocProvider.of<AccountBloc>(context))),
-        BlocProvider(create: (context) => CategoryBloc()),
-        BlocProvider<CreateCateBloc>(
-            create: (context) => CreateCateBloc(
-                categoryBloc: BlocProvider.of<CategoryBloc>(context))),
-        BlocProvider<GetAllProductBloc>(create: (context) => GetAllProductBloc()),
-        BlocProvider<CreateProductBloc>(create: (context) => CreateProductBloc()),
-      ],
+      providers: getBlocProviders(context),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -80,11 +70,23 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case '/product-description':
-              return PageTransition(child: ProductDescription(), type: PageTransitionType.bottomToTop, settings: settings,);
+              return PageTransition(
+                child: ProductDescription(),
+                type: PageTransitionType.bottomToTop,
+                settings: settings,
+              );
               break;
             case '/product-properties':
-              return PageTransition(child: ProductProperties(), type: PageTransitionType.bottomToTop, settings: settings);
+              return PageTransition(
+                  child: ProductProperties(),
+                  type: PageTransitionType.bottomToTop,
+                  settings: settings);
               break;
+            case '/create-stock':
+              return PageTransition(
+                  child: CreateStockScreen(),
+                  type: PageTransitionType.bottomToTop,
+                  settings: settings);
             default:
               return null;
           }

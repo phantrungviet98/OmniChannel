@@ -23,3 +23,14 @@ class PosServiceConfigs {
     cache: GraphQLCache(),
   );
 }
+
+class ShippingServiceConfigs {
+  static final HttpLink httpLink = HttpLink('https://shipping-service-dev.azsales.vn/graphql');
+  static String token = '';
+  static final AuthLink authLink = AuthLink(headerKey: 'access_token', getToken: () => token);
+  static final Link link = authLink.concat(httpLink);
+  static GraphQLClient client = GraphQLClient(
+    link: link,
+    cache: GraphQLCache(),
+  );
+}
