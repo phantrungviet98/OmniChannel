@@ -5,6 +5,7 @@ import 'package:omnichannel_flutter/bloc/LocationData/LocationDataBloc.dart';
 import 'package:omnichannel_flutter/bloc/LocationData/LocationDataEvent.dart';
 import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneStockInput.dart';
+import 'package:omnichannel_flutter/data/repository/remote_repository.dart';
 import 'package:omnichannel_flutter/modules/stock/bloc/CreateStock/CreateStockEvent.dart';
 import 'package:omnichannel_flutter/modules/stock/bloc/CreateStock/CreateStockState.dart';
 import 'package:omnichannel_flutter/modules/stock/bloc/CreateStock/CreateStockState.model.dart';
@@ -19,20 +20,23 @@ class CreateStockBloc extends Bloc<CreateStockEvent, CreateStockState> {
 
   @override
   Stream<CreateStockState> mapEventToState(CreateStockEvent event) async* {
+    if (event is Reset) {
+      yield CreateStockState(
+          createOneStockInput: CreateOneStockInput(),
+          status: Status.initial,
+          error: CreateStockErrorModel());
+    }
+
+    if (event is UpdateStockEventInitData) {
+      locationDataBloc.add(LocationDataEventGetCitiesDistrictsWards(
+          cityCode: event.data.cityCode, districtCode: event.data.districtCode));
+      yield state.copyWith(createOneStockInput: event.data);
+    }
+
     if (event is CreateStockEventDataChanged) {
       final data = event.data;
-      if (data.cityCode != null &&
-          data.cityCode != state.createOneStockInput.cityCode) {
-        locationDataBloc
-            .add(LocationDataEventGetDistricts(cityCode: data.cityCode));
-        data.districtCode = null;
-        data.wardCode = null;
-      } else if (data.districtCode != null &&
-          data.districtCode != state.createOneStockInput.districtCode) {
-        locationDataBloc.add(LocationDataEventGetWards(districtCode: data.districtCode));
-        data.wardCode = null;
-      }
-      yield state.copyWith(
+
+      CreateStockState tState = state.copyWith(
           createOneStockInput: state.createOneStockInput.copyWith(
             address: data.address,
             name: data.name,
@@ -42,12 +46,56 @@ class CreateStockBloc extends Bloc<CreateStockEvent, CreateStockState> {
             wardCode: data.wardCode,
           ),
           error: CreateStockErrorModel());
+
+      // Update case
+      if (data.cityCode != null &&
+          data.cityCode != state.createOneStockInput.cityCode) {
+        tState.createOneStockInput.districtCode = null;
+        tState.createOneStockInput.wardCode = null;
+        locationDataBloc
+            .add(LocationDataEventGetDistricts(cityCode: data.cityCode));
+      } else if (data.districtCode != null &&
+          data.districtCode != state.createOneStockInput.districtCode) {
+        tState.createOneStockInput.wardCode = null;
+        locationDataBloc
+            .add(LocationDataEventGetWards(districtCode: data.districtCode));
+      }
+      yield tState;
     }
     if (event is CreateStockEventRequest) {
       final error = _validData();
       if (error.checkIfAnyError()) {
         yield state.copyWith(error: error);
-      } else {}
+      } else {
+        yield state.copyWith(status: Status.loading);
+        try {
+          final result =
+              await RemoteRepository.createStock(state.createOneStockInput);
+          if (result != null) {
+            yield state.copyWith(status: Status.success);
+          }
+        } catch (e) {
+          yield state.copyWith(status: Status.fail);
+        }
+      }
+    }
+
+    if (event is UpdateStockEventRequest) {
+      final error = _validData();
+      if (error.checkIfAnyError()) {
+        yield state.copyWith(error: error);
+      } else {
+        yield state.copyWith(status: Status.loading);
+        try {
+          final result = await RemoteRepository.updateStock(event.id, state.createOneStockInput);
+          log('Update Stock' + result.toString());
+          if (result != null) {
+            yield state.copyWith(status: Status.success);
+          }
+        } catch (e) {
+          yield state.copyWith(status: Status.fail);
+        }
+      }
     }
   }
 

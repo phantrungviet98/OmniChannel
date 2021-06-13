@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
 import 'package:omnichannel_flutter/data/repository/remote_repository.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductEvent.dart';

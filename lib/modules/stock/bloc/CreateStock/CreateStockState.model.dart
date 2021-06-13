@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:collection/collection.dart';
 
 class CreateStockErrorModel extends Equatable {
   CreateStockErrorModel(
@@ -24,8 +25,8 @@ class CreateStockErrorModel extends Equatable {
           cityError,
           districtError,
           wardError
-        ].firstWhere((element) => element != null && element.isNotEmpty,
-            orElse: null) !=
+        ].firstWhereOrNull(
+            (element) => element != null && element.isNotEmpty) !=
         null;
   }
 

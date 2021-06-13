@@ -11,21 +11,17 @@ import 'package:omnichannel_flutter/modules/auth/screens/login/main.dart';
 import 'package:omnichannel_flutter/modules/auth/screens/onBoard/main.dart';
 import 'package:omnichannel_flutter/modules/auth/screens/signUp/main.dart';
 import 'package:omnichannel_flutter/modules/home/screens/main.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/Category/CategoryBloc.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/CreateCate/CreateCateBloc.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductBloc.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/GetAllProduct/GetAllProductBloc.dart';
 import 'package:omnichannel_flutter/modules/product/screens/CreateProduct/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductDescription/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductManagement/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/main.dart';
 import 'package:omnichannel_flutter/modules/product/screens/SelectCategory/main.dart';
 import 'package:omnichannel_flutter/modules/splash/screens/splash/main.dart';
-import 'package:omnichannel_flutter/modules/stock/screens/CreateStock/main.dart';
+import 'package:omnichannel_flutter/modules/stock/screens/CreateStockSuccess/CreateStockSuccessScreen.dart';
+import 'package:omnichannel_flutter/modules/stock/screens/CreateUpdateStock/main.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'modules/home/screens/createExportScreen/createExportScreen.dart';
-
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -82,9 +78,14 @@ class MyApp extends StatelessWidget {
                   type: PageTransitionType.bottomToTop,
                   settings: settings);
               break;
-            case '/create-stock':
+            case '/create-update-stock':
               return PageTransition(
-                  child: CreateStockScreen(),
+                  child: CreateUpdateStockScreen(),
+                  type: PageTransitionType.bottomToTop,
+                  settings: settings);
+            case '/create-stock-success':
+              return PageTransition(
+                  child: CreateStockSuccessScreen(),
                   type: PageTransitionType.bottomToTop,
                   settings: settings);
             default:
@@ -102,6 +103,7 @@ class MyApp extends StatelessWidget {
           '/select-category': (context) => SelectCategoryScreen(),
           '/product-management': (context) => ProductManagementScreen(),
           '/createExport': (context) => createExportScreen(),
+
           /// mình định code phần màn này nhưng thôi
           // '/listOrderScreen':(context) => ListOrderScreen(),
         },

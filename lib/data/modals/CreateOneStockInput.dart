@@ -1,4 +1,6 @@
-class CreateOneStockInput {
+import 'package:equatable/equatable.dart';
+
+class CreateOneStockInput extends Equatable {
   String name;
   String phoneNumber;
   String address;
@@ -33,6 +35,9 @@ class CreateOneStockInput {
     data['ward_code'] = this.wardCode;
     return data;
   }
+
+  @override
+  List<Object> get props => [name, phoneNumber, address, cityCode, districtCode, wardCode];
 }
 
 extension CreateOneStockInputCopyWith on CreateOneStockInput {

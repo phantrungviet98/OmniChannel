@@ -5,6 +5,7 @@ import 'package:either_option/either_option.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:omnichannel_flutter/config/client.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneStockInput.dart';
 import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 import 'package:omnichannel_flutter/data/modals/Location.dart';
 import 'package:omnichannel_flutter/data/modals/LoginResponse.dart';
@@ -76,6 +77,7 @@ class RemoteRepository {
          query {
             stock {
               stocks {
+                _id
                 name
                 phone_number
                 address
@@ -106,7 +108,10 @@ class RemoteRepository {
               }
             }
           }  
-      ''')));
+      '''), fetchPolicy: FetchPolicy.cacheAndNetwork));
+
+      log(result.toString());
+
       List<Stock> list = List.from(
           result.data['stock']['stocks']?.map((e) => Stock.fromJson(e)));
       return list;
@@ -178,6 +183,44 @@ class RemoteRepository {
       return List.from(
           result.data['location']['wards']?.map((e) => Ward.fromJson(e)));
     } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<String> createStock(CreateOneStockInput data) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+          mutation(\$record: CreateOneStockInput!) {
+            stock {
+              createStock(record: \$record) {
+                recordId
+              }
+            }
+          }
+        '''), variables: {'record': data.toJson()}));
+      return result.data['stock']['createStock']['recordId'];
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<String> updateStock(String id, CreateOneStockInput data) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+            mutation(\$id: String, \$record: UpdateOneStockInput!) {
+              stock {
+                updateStock(filter: {_id: \$id}, record: \$record) {
+                  recordId
+                }
+              }
+            }
+          '''), variables: {'id': id, 'record': data}));
+      log('updateStock' + result.toString());
+      return result.data['stock']['updateStock']['recordId'];
+    } catch (e) {
+      log('updateStockerr' + e.toString());
       throw e;
     }
   }

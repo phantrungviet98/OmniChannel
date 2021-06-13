@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/Stock.dart';
-import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductState.dart';
 
 class StorehouseState extends Equatable {
   const StorehouseState({this.stocks, this.status});

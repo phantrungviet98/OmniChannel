@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:equatable/equatable.dart';
 import 'package:omnichannel_flutter/data/modals/Location.dart';
 
 class Stocks {
@@ -22,7 +25,8 @@ class Stocks {
   }
 }
 
-class Stock {
+class Stock extends Equatable {
+  String id;
   String name;
   String phoneNumber;
   String address;
@@ -33,30 +37,33 @@ class Stock {
   bool isActive;
   String createdBy;
   int dateCreated;
-  double dateUpdated;
+  int dateUpdated;
   String updatedBy;
   City city;
   District district;
   Ward ward;
 
   Stock(
-      {this.name,
-        this.phoneNumber,
-        this.address,
-        this.wardCode,
-        this.districtCode,
-        this.cityCode,
-        this.isPrimary,
-        this.isActive,
-        this.createdBy,
-        this.dateCreated,
-        this.dateUpdated,
-        this.updatedBy,
-        this.city,
-        this.district,
-        this.ward});
+      {
+      this.id,
+      this.name,
+      this.phoneNumber,
+      this.address,
+      this.wardCode,
+      this.districtCode,
+      this.cityCode,
+      this.isPrimary,
+      this.isActive,
+      this.createdBy,
+      this.dateCreated,
+      this.dateUpdated,
+      this.updatedBy,
+      this.city,
+      this.district,
+      this.ward});
 
   Stock.fromJson(Map<String, dynamic> json) {
+    id = json['_id'];
     name = json['name'];
     phoneNumber = json['phone_number'];
     address = json['address'];
@@ -78,6 +85,7 @@ class Stock {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.id;
     data['name'] = this.name;
     data['phone_number'] = this.phoneNumber;
     data['address'] = this.address;
@@ -101,4 +109,39 @@ class Stock {
     }
     return data;
   }
+
+  //String name;
+  //   String phoneNumber;
+  //   String address;
+  //   int wardCode;
+  //   int districtCode;
+  //   int cityCode;
+  //   bool isPrimary;
+  //   bool isActive;
+  //   String createdBy;
+  //   int dateCreated;
+  //   double dateUpdated;
+  //   String updatedBy;
+  //   City city;
+  //   District district;
+  //   Ward ward;
+
+  @override
+  List<Object> get props => [
+        name,
+        phoneNumber,
+        address,
+        wardCode,
+        districtCode,
+        cityCode,
+        isPrimary,
+        isActive,
+        createdBy,
+        dateCreated,
+        dateUpdated,
+        updatedBy,
+        city,
+        district,
+        ward,
+      ];
 }

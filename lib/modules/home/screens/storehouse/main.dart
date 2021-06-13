@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
+import 'package:omnichannel_flutter/assets/json/JsonAnimates.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
 import 'package:omnichannel_flutter/common/fonts/FontSize.dart';
 import 'package:omnichannel_flutter/common/ui/BaseScreen.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneStockInput.dart';
 import 'package:omnichannel_flutter/modals/home-modals.dart';
 import 'package:omnichannel_flutter/modules/home/screens/storehouse/bloc/StorehouseBloc.dart';
 import 'package:omnichannel_flutter/modules/home/screens/storehouse/bloc/StorehouseEvent.dart';
 import 'package:omnichannel_flutter/modules/home/screens/storehouse/bloc/StorehouseState.dart';
 import 'package:omnichannel_flutter/modules/home/screens/storehouse/widgets/StorehouseItem.dart';
+import 'package:omnichannel_flutter/modules/stock/bloc/CreateStock/CreateStockBloc.dart';
+import 'package:omnichannel_flutter/modules/stock/bloc/CreateStock/CreateStockEvent.dart';
+import 'package:omnichannel_flutter/modules/stock/screens/CreateUpdateStock/main.dart';
 import 'package:omnichannel_flutter/utis/ui/Shadow.dart';
 
 class StorehouseScreen extends BaseScreenStateful {
@@ -118,7 +125,16 @@ class _State extends State<StorehouseScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Icon(Icons.edit),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/create-update-stock',
+                                      arguments:
+                                          CreateUpdateStockScreenArgument(
+                                              stock));
+                                },
+                                child: Icon(Icons.edit),
+                              ),
                               Icon(
                                 Icons.delete,
                                 color: Colors.redAccent,
@@ -134,8 +150,11 @@ class _State extends State<StorehouseScreen> {
             ],
           ),
           floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, '/create-stock'),
+            child: state.status == Status.loading
+                ? Lottie.asset(JsonAnimates.loadingV2, width: 32, height: 32)
+                : Icon(Icons.add),
+            onPressed: () =>
+                Navigator.pushNamed(context, '/create-update-stock'),
             backgroundColor: AppColors.sage,
           ),
         );

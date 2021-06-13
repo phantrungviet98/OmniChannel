@@ -1,10 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
-
-enum Status {
-  initial, loading, success, fail
-}
 
 class CreateProductState extends Equatable {
   const CreateProductState({@required this.createProductInput, @required this.status});
