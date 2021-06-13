@@ -53,6 +53,101 @@ class createExportScreenState extends State<createExportScreen> {
     });
   }
 
+  _showBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.3,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+            ),
+            child: Container(
+              padding: EdgeInsets.only(top: 50, bottom: 20, right: 30, left: 30),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () async {
+                      final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+                      setState(() {
+                        if (pickedFile != null) {
+                          _image = File(pickedFile.path);
+                          Navigator.pop(context);
+                        } else {
+                          print('No image selected.');
+                        }
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey.shade50),
+                      padding: EdgeInsets.all(8),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.camera_alt,
+                            size: 30,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Chụp ảnh từ Camera",
+                            style: TextStyle(color: Colors.black, fontSize: 18),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+                      setState(() {
+                        if (pickedFile != null) {
+                          _image = File(pickedFile.path);
+                          Navigator.pop(context);
+                        } else {
+                          print('No image selected.');
+                        }
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(10)), color: Colors.grey.shade50),
+                      padding: EdgeInsets.all(8),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.photo,
+                            size: 30,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Chọn ảnh từ thư viện",
+                            style: TextStyle(color: Colors.black, fontSize: 18),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   ///chỗ này sẽ gọi API up data lên
   _onPressSubmit() {
     FocusScope.of(context).requestFocus(FocusNode());
@@ -79,9 +174,9 @@ class createExportScreenState extends State<createExportScreen> {
           content: const Text('Đoạn này build thử nên dùng mấy cái normal nhất nhé'),
           actions: <Widget>[
             TextButton(
-              onPressed:(){
+              onPressed: () {
                 Navigator.pop(context);
-                Navigator.pop(context,true);
+                Navigator.pop(context, true);
               },
               child: const Text('OK'),
             ),
@@ -234,15 +329,7 @@ class createExportScreenState extends State<createExportScreen> {
                   Spacer(),
                   InkWell(
                     onTap: () async {
-                      final pickedFile = await picker.getImage(source: ImageSource.camera);
-
-                      setState(() {
-                        if (pickedFile != null) {
-                          _image = File(pickedFile.path);
-                        } else {
-                          print('No image selected.');
-                        }
-                      });
+                      _showBottomSheet();
                     },
                     child: Icon(
                       Icons.add_a_photo_outlined,
