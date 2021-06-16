@@ -5,6 +5,7 @@ import 'package:omnichannel_flutter/common/colors/Colors.dart';
 import 'package:omnichannel_flutter/common/fonts/FontSize.dart';
 import 'package:omnichannel_flutter/common/ui/BaseScreen.dart';
 import 'package:omnichannel_flutter/modals/home-modals.dart';
+import 'package:omnichannel_flutter/modules/add_order/list_order_screen.dart';
 import 'package:omnichannel_flutter/modules/home/screens/order/widgets/OptionItem.dart';
 
 class _Option {
@@ -16,22 +17,12 @@ class _Option {
 }
 
 class OrderScreen extends BaseScreen {
-  static final theme = ScreenTheme(
-      color: AppColors.sage, title: 'Đơn hàng', icon: Icons.favorite_border_rounded);
+  static final theme = ScreenTheme(color: AppColors.sage, title: 'Đơn hàng', icon: Icons.favorite_border_rounded);
 
   final List<_Option> _options = [
-    _Option(
-        icon: Icon(Icons.receipt),
-        title: 'Danh sách đơn hàng',
-        onPressed: () {}),
-    _Option(
-        icon: Icon(Icons.keyboard_return),
-        title: 'Hàng trả lại',
-        onPressed: () {}),
-    _Option(
-        icon: Icon(Icons.transfer_within_a_station),
-        title: 'Quản lý giao hàng',
-        onPressed: () {}),
+    _Option(icon: Icon(Icons.receipt), title: 'Danh sách đơn hàng', onPressed: () {}),
+    _Option(icon: Icon(Icons.keyboard_return), title: 'Hàng trả lại', onPressed: () {}),
+    _Option(icon: Icon(Icons.transfer_within_a_station), title: 'Quản lý giao hàng', onPressed: () {}),
   ];
 
   @override
@@ -50,27 +41,30 @@ class OrderScreen extends BaseScreen {
               flexibleSpace: FlexibleSpaceBar(
                   collapseMode: CollapseMode.pin,
                   centerTitle: true,
-                  title: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 8),
-                          child: Text('Tạo đơn hàng',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: FontSize.soBig,
-                                  color: Colors.white)),
-                        ),
-                        ElevatedButton(
-                            onPressed: () {},
-                            child: Lottie.asset(JsonAnimates.add, height: 20)),
-                      ]))),
+                  title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Text('Tạo đơn hàng',
+                          textAlign: TextAlign.center, style: TextStyle(fontSize: FontSize.soBig, color: Colors.white)),
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          var result = await Navigator.pushNamed(context, "/createOrder");
+                          if (result == true) {
+                            ///gọi lại API ở đây để refresh
+                          }
+                        },
+                        child: Lottie.asset(JsonAnimates.add, height: 20)),
+                  ]))),
           SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
             return OptionItem(
               icon: _options[index].icon,
               title: _options[index].title,
-              onPressed: () {},
+              ///Đoạn này bạn chỉnh lại cho phù hợp với 2 button còn lại nhé
+              onPressed: () {
+              Navigator.pushNamed(context, '/listOrder');
+              },
             );
           }, childCount: _options.length)),
         ],
