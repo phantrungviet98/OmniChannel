@@ -1,3 +1,3 @@
 double jsonToDouble(dynamic value) {
-  return value.toDouble();
+  return value?.toDouble();
 }

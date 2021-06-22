@@ -14,7 +14,7 @@ class ProductItem extends StatelessWidget {
       @required this.total,
       @required this.dateCreated});
 
-  final int id;
+  final String id;
   final String photo;
   final String name;
   final double price;
@@ -42,12 +42,12 @@ class ProductItem extends StatelessWidget {
               height: 100,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
-            child: Text(
-              'Code: ' + this.id.toString(),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(top: 8, bottom: 8),
+          //   child: Text(
+          //     'Code: ' + this.id,
+          //   ),
+          // ),
           Padding(
             padding: EdgeInsets.only(bottom: 30),
             child: Text(

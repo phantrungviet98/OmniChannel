@@ -4,8 +4,8 @@ import 'dart:ffi';
 import 'package:equatable/equatable.dart';
 import 'package:omnichannel_flutter/utis/number.dart';
 
-class Product {
-  int id;
+class Product extends Equatable {
+  String id;
   String name;
   Null desc;
   double price;
@@ -37,37 +37,37 @@ class Product {
 
   Product(
       {this.id,
-        this.name,
-        this.desc,
-        this.price,
-        this.inPrice,
-        this.salePrice,
-        this.weight,
-        this.catIds,
-        this.brandId,
-        this.tagIds,
-        this.men,
-        this.women,
-        this.boy,
-        this.girl,
-        this.variants,
-        this.attributes,
-        this.createdBy,
-        this.dateCreated,
-        this.dateUpdated,
-        this.updatedBy,
-        this.photoIds,
-        this.isActive,
-        this.featuredPhoto,
-        this.stockData,
-        this.tags,
-        this.photos,
-        this.createdByUser,
-        this.brand,
-        this.cats});
+      this.name,
+      this.desc,
+      this.price,
+      this.inPrice,
+      this.salePrice,
+      this.weight,
+      this.catIds,
+      this.brandId,
+      this.tagIds,
+      this.men,
+      this.women,
+      this.boy,
+      this.girl,
+      this.variants,
+      this.attributes,
+      this.createdBy,
+      this.dateCreated,
+      this.dateUpdated,
+      this.updatedBy,
+      this.photoIds,
+      this.isActive,
+      this.featuredPhoto,
+      this.stockData,
+      this.tags,
+      this.photos,
+      this.createdByUser,
+      this.brand,
+      this.cats});
 
   Product.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['_id'];
     name = json['name'];
     desc = json['desc'];
     price = jsonToDouble(json['price']);
@@ -130,7 +130,7 @@ class Product {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
+    data['_id'] = this.id;
     data['name'] = this.name;
     data['desc'] = this.desc;
     data['price'] = this.price;
@@ -177,6 +177,39 @@ class Product {
     }
     return data;
   }
+
+  @override
+  List<Object> get props => [
+        id,
+        name,
+        desc,
+        price,
+        inPrice,
+        salePrice,
+        weight,
+        catIds,
+        brandId,
+        tagIds,
+        men,
+        women,
+        boy,
+        girl,
+        variants,
+        attributes,
+        createdBy,
+        dateCreated,
+        dateUpdated,
+        updatedBy,
+        photoIds,
+        isActive,
+        featuredPhoto,
+        stockData,
+        tags,
+        photos,
+        createdByUser,
+        brand,
+        cats
+      ];
 }
 
 class ProductStock {
@@ -185,6 +218,7 @@ class ProductStock {
   dynamic qtyByVariant;
 
   ProductStock({this.total, this.qtyByStock, this.qtyByVariant});
+
   ProductStock.fromJson(Map<String, dynamic> json) {
     total = json['total'];
     qtyByStock = json['qty_by_stock'];
@@ -203,12 +237,12 @@ class Variants {
 
   Variants(
       {this.id,
-        this.weight,
-        this.price,
-        this.inPrice,
-        this.salePrice,
-        this.barcode,
-        this.attributes});
+      this.weight,
+      this.price,
+      this.inPrice,
+      this.salePrice,
+      this.barcode,
+      this.attributes});
 
   Variants.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -259,8 +293,6 @@ class Attributes extends Equatable {
 
   @override
   List<Object> get props => [name, value];
-
-
 }
 
 class FeaturedPhoto {
@@ -302,11 +334,11 @@ class CreatedByUser {
 
   CreatedByUser(
       {this.displayName,
-        this.email,
-        this.username,
-        this.userRole,
-        this.isActive,
-        this.dateCreated});
+      this.email,
+      this.username,
+      this.userRole,
+      this.isActive,
+      this.dateCreated});
 
   CreatedByUser.fromJson(Map<String, dynamic> json) {
     displayName = json['display_name'];
@@ -364,7 +396,8 @@ class Photo {
   String createdBy;
   bool isActive;
 
-  Photo({this.url, this.origin, this.dateCreated, this.createdBy, this.isActive});
+  Photo(
+      {this.url, this.origin, this.dateCreated, this.createdBy, this.isActive});
 
   Photo.fromJson(Map<String, dynamic> json) {
     url = json['url'];

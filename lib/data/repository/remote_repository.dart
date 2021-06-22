@@ -5,7 +5,9 @@ import 'package:either_option/either_option.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:omnichannel_flutter/config/client.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneProductInput.dart';
+import 'package:omnichannel_flutter/data/modals/CreateOneStockImportExportInput.dart';
 import 'package:omnichannel_flutter/data/modals/CreateOneStockInput.dart';
+import 'package:omnichannel_flutter/data/modals/Export.dart';
 import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 import 'package:omnichannel_flutter/data/modals/Location.dart';
 import 'package:omnichannel_flutter/data/modals/LoginResponse.dart';
@@ -222,6 +224,209 @@ class RemoteRepository {
     } catch (e) {
       log('updateStockerr' + e.toString());
       throw e;
+    }
+  }
+
+  static Future<ExportsPaging> getExportsPaging(int page, int perPage) async {
+    try {
+      final result = await PosServiceConfigs.client.query(QueryOptions(
+          document: gql('''
+            query(\$page:Int, \$perPage:Int) {
+              stock {
+                 exportsPaging(page:\$page , perPage: \$perPage, sort:ID_DESC) {
+                   count, items {
+                     items { product_id_ref, product_name, variant_id, attribute, qty, _id},
+                     created_by_user { _id, display_name, username },
+                     _id, id, note, stock_id, type, created_by, date_created, status,
+                     stock { name }
+                   },
+                   pageInfo { currentPage, pageCount, itemCount, hasNextPage }
+                 }
+              }
+            }
+          '''),
+          variables: {'page': page, 'perPage': perPage},
+          fetchPolicy: FetchPolicy.cacheAndNetwork));
+      return ExportsPaging.fromJson(result.data['stock']['exportsPaging']);
+    } catch (e) {
+      log('getStocksPagingError' + e.toString());
+      throw e;
+    }
+  }
+
+  static Future<ExportsPaging> getImportsPaging(int page, int perPage) async {
+    try {
+      final result = await PosServiceConfigs.client.query(QueryOptions(
+          document: gql('''
+            query(\$page:Int, \$perPage:Int) {
+              stock {
+                 importsPaging(page:\$page , perPage: \$perPage, sort:ID_DESC) {
+                   count, items {
+                     items { product_id_ref, product_name, variant_id, attribute, qty, _id},
+                     created_by_user { _id, display_name, username },
+                     _id, id, note, stock_id, type, created_by, date_created, status,
+                     stock { name }
+                   },
+                   pageInfo { currentPage, pageCount, itemCount, hasNextPage }
+                 }
+              }
+            }
+          '''),
+          variables: {'page': page, 'perPage': perPage},
+          fetchPolicy: FetchPolicy.cacheAndNetwork));
+
+      log(result.toString());
+      return ExportsPaging.fromJson(result.data['stock']['importsPaging']);
+    } catch (e) {
+      log('getImportsPaging' + e.toString());
+      throw e;
+    }
+  }
+
+  static Future<int> cancelExport(String id) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+            mutation(\$_id:String) {
+              stock {
+                 cancelExport(_id: \$_id) {
+                    status
+                 }
+              }
+            }
+          '''), variables: {'_id': id}));
+      log(result.toString());
+      return int.parse(result.data['stock']['cancelExport']['status']);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<int> cancelImport(String id) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+            mutation(\$_id:String) {
+              stock {
+                 cancelImport(_id: \$_id) {
+                    status
+                 }
+              }
+            }
+          '''), variables: {'_id': id}));
+      return int.parse(result.data['stock']['cancelImport']['status']);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<StockExport> cloneImport(String id) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+            mutation cloneImport(\$_id: String) {
+                stock {
+                    cloneImport(_id: \$_id) {
+                        items { product_id_ref, product_name, variant_id, attribute, qty, _id},
+                        created_by_user { _id, display_name, username },
+                        _id, id, note, stock_id, type, created_by, date_created, status,
+                        stock { name }
+                    }
+                }
+            }
+          '''), variables: {'_id': id}));
+      return StockExport.fromJson(result.data['stock']['cloneImport']);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<StockExport> cloneExport(String id) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
+            mutation cloneExport(\$_id: String) {
+                stock {
+                    cloneExport(_id: \$_id) {
+                        items { product_id_ref, product_name, variant_id, attribute, qty, _id},
+                        created_by_user { _id, display_name, username },
+                        _id, id, note, stock_id, type, created_by, date_created, status,
+                        stock { name }
+                    }
+                }
+            }
+          '''), variables: {'_id': id}));
+      return StockExport.fromJson(result.data['stock']['cloneExport']);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<List<Product>> lookupProduct(String text) async {
+    try {
+      final result = await PosServiceConfigs.client.query(QueryOptions(
+          document: gql('''
+            query lookup(\$text:String){
+                product {
+                    lookup(text:\$text) {
+                        _id, name, featured_photo {_id, url}, variants {
+                          _id, id, weight, price, barcode, attributes {name, value}
+                        }
+                    }
+                }
+            }
+          '''),
+          variables: {'text': text},
+          fetchPolicy: FetchPolicy.cacheAndNetwork));
+      final List<Product> products = [];
+      if (result.data['product']['lookup'] != null) {
+        result.data['product']['lookup'].forEach((e) {
+          products.add(Product.fromJson(e));
+        });
+      }
+      return products;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  static Future<bool> createImport(CreateOneStockImportExportInput record) async {
+    try {
+      final result = await PosServiceConfigs.client.mutate(MutationOptions(document: gql('''
+        mutation (\$record:CreateOneStockImportInput!) {
+                stock {
+                    createImport(record: \$record) {
+                        recordId
+                    }
+                  }
+              }
+      ''')));
+
+      log('ress123123213' + result.toString());
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> createExport(CreateOneStockImportExportInput record) async {
+    try {
+      final result = await PosServiceConfigs.client.mutate(MutationOptions(document: gql('''
+        mutation (\$record:CreateOneStockExportInput!) {
+                stock {
+                    createExport(record: \$record) {
+                        recordId
+                    }
+                  }
+              }
+      '''), variables: {'record': record.toJson()}));
+
+      log('ress123123213' + result.toString());
+
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

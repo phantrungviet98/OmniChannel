@@ -47,6 +47,8 @@ class _State extends State<ProductManagementScreen> {
               itemBuilder: (context, index) {
                 final product = state.products[index];
 
+                log(product.toString());
+
                 return ProductItem(
                   id: product.id,
                   photo:

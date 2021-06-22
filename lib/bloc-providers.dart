@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:omnichannel_flutter/bloc/LocationData/LocationDataBloc.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Account/AccountBloc.dart';
 import 'package:omnichannel_flutter/modules/auth/bloc/Login/LoginBloc.dart';
+import 'package:omnichannel_flutter/modules/export/bloc/ExportBloc.dart';
+import 'package:omnichannel_flutter/modules/home/bloc/CreateImportExport/CreateImportExportBloc.dart';
 import 'package:omnichannel_flutter/modules/home/screens/storehouse/bloc/StorehouseBloc.dart';
+import 'package:omnichannel_flutter/modules/import/bloc/ImportBloc.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/Category/CategoryBloc.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/CreateCate/CreateCateBloc.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreateProductBloc.dart';
@@ -27,5 +30,8 @@ getBlocProviders(BuildContext context) {
     BlocProvider<CreateStockBloc>(
         create: (context) =>
             CreateStockBloc(BlocProvider.of<LocationDataBloc>(context))),
+    BlocProvider<ExportBloc>(create: (context) => ExportBloc()),
+    BlocProvider<ImportBloc>(create: (context) => ImportBloc()),
+    BlocProvider<CreateImportExportBloc>(create: (context) => CreateImportExportBloc()),
   ];
 }

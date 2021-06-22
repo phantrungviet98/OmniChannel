@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter/material.dart';
+import 'package:omnichannel_flutter/common/colors/Colors.dart';
 
 
 class NormalTextInput extends StatefulWidget {
@@ -34,6 +35,8 @@ class NormalTextInput extends StatefulWidget {
   final ThemeData themeData; // dùng để thay đổi Theme (vd: màu chữ label khi floating)
   final Brightness keyboardAppearance;
   final bool readOnly;
+  final int minLines;
+  final int maxLines;
 
   const NormalTextInput({
     this.fontSize,
@@ -64,6 +67,8 @@ class NormalTextInput extends StatefulWidget {
     this.autoFocus,
     this.keyboardAppearance,
     this.readOnly,
+    this.minLines,
+    this.maxLines,
   });
 
   @override
@@ -82,14 +87,14 @@ class _NormalTextInputState extends State<NormalTextInput> {
     return Theme(
       data: widget.themeData ??
           ThemeData(
-            primaryColor: Colors.blueAccent,
+            primaryColor: AppColors.sage,
             hintColor: Colors.grey,
           ),
       child: TextField(
         readOnly: widget.readOnly ?? false,
         style: TextStyle(
             fontSize: widget.fontSize ?? 18,
-            color: widget.color ?? Colors.blueAccent,
+            color: widget.color ?? Colors.black,
             fontFamily: widget.fontFamily ),
         decoration: InputDecoration(
             contentPadding: widget.contentPadding,
@@ -112,7 +117,7 @@ class _NormalTextInputState extends State<NormalTextInput> {
             focusedBorder: widget.hideUnderBorderLine == true
                 ? UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent, width: 0.1))
                 : UnderlineInputBorder(
-                borderSide: BorderSide(color: widget.focusColor ?? Colors.blueAccent, width: 2)),
+                borderSide: BorderSide(color: widget.focusColor ?? AppColors.sage, width: 2)),
             enabledBorder: widget.hideUnderBorderLine == true
                 ? UnderlineInputBorder(borderSide: BorderSide(color: Colors.transparent, width: 0.1))
                 : UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 1))),
@@ -124,6 +129,8 @@ class _NormalTextInputState extends State<NormalTextInput> {
         onChanged: widget.onChanged ?? onChanged,
         autofocus: widget.autoFocus ?? false,
         keyboardAppearance: widget.keyboardAppearance ?? Brightness.light,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
       ),
     );
   }
