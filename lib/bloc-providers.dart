@@ -19,10 +19,6 @@ getBlocProviders(BuildContext context) {
     BlocProvider<LoginBloc>(
         create: (context) =>
             LoginBloc(accountBloc: BlocProvider.of<AccountBloc>(context))),
-    BlocProvider(create: (context) => CategoryBloc()),
-    BlocProvider<CreateCateBloc>(
-        create: (context) => CreateCateBloc(
-            categoryBloc: BlocProvider.of<CategoryBloc>(context))),
     BlocProvider<GetAllProductBloc>(create: (context) => GetAllProductBloc()),
     BlocProvider<CreateProductBloc>(create: (context) => CreateProductBloc()),
     BlocProvider<StorehouseBloc>(create: (context) => StorehouseBloc()),

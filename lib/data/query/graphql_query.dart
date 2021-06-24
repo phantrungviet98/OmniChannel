@@ -43,6 +43,7 @@ class GraphQLQuery {
     query {
       product {
         products {
+          id
           _id
           photos {
             url

@@ -32,7 +32,8 @@ class PropertiesTable extends StatelessWidget {
 
   _onRemoveValueOfAttribute(int attributeIndex, int valueIndex) {
     attributes[attributeIndex].values.removeAt(valueIndex);
-    onAttributeChanged(this.attributes);
+
+    onAttributeChanged(this.attributes.where((e) => e.values.isNotEmpty).toList());
   }
 
   _buildTableRow() {

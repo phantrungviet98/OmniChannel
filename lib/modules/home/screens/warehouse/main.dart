@@ -7,6 +7,7 @@ import 'package:omnichannel_flutter/assets/png-jpg/PngJpg.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
 import 'package:omnichannel_flutter/common/fonts/FontSize.dart';
 import 'package:omnichannel_flutter/common/ui/BaseScreen.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/Export.dart';
 import 'package:omnichannel_flutter/modals/home-modals.dart';
 import 'package:omnichannel_flutter/modules/export/bloc/ExportBloc.dart';
@@ -18,6 +19,7 @@ import 'package:omnichannel_flutter/modules/import/bloc/ImportEvent.dart';
 import "package:collection/collection.dart";
 import 'package:omnichannel_flutter/modules/import/bloc/ImportState.dart';
 import 'package:omnichannel_flutter/utis/date.dart';
+import 'package:omnichannel_flutter/widgets/FullScreenLoading/main.dart';
 
 class WarehouseScreen extends BaseScreenStateful {
   static final theme = ScreenTheme(
@@ -156,7 +158,7 @@ class _State extends State<WarehouseScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: AppColors.sage,
         child: Icon(Icons.add),
         onPressed: () => Navigator.pushNamed(context, "/createExport",
             arguments: CreateImportExportType.IMPORT),
@@ -168,6 +170,9 @@ class _State extends State<WarehouseScreen>
         child: BlocBuilder<ImportBloc, ImportState>(
           builder: (context, state) {
             if (state.imports.items.length == 0) {
+              if (state.status == Status.loading) {
+                return FullScreenLoading();
+              }
               return Center(
                 child: Padding(
                   padding: EdgeInsets.only(left: 30, right: 30, top: 90),

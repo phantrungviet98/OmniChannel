@@ -112,3 +112,14 @@ class CreateProductEventRequest extends CreateProductEvent {
 class CreateProductEventClear extends CreateProductEvent {
   const CreateProductEventClear();
 }
+
+class GetProductDetail extends CreateProductEvent {
+  const GetProductDetail(this.id);
+  final String id;
+}
+
+class UpdateProductRequest extends CreateProductEvent {
+  const UpdateProductRequest(this.id, {this.callback});
+  final String id;
+  final Function(bool) callback;
+}

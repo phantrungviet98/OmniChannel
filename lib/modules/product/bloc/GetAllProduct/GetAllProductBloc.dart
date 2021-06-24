@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:omnichannel_flutter/data/modals/ManagementProductResponse.dart';
 import 'package:omnichannel_flutter/data/repository/remote_repository.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/GetAllProduct/GetAllProductEvent.dart';
 import 'package:omnichannel_flutter/modules/product/bloc/GetAllProduct/GetAllProductState.dart';

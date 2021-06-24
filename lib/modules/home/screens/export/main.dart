@@ -7,6 +7,7 @@ import 'package:omnichannel_flutter/assets/png-jpg/PngJpg.dart';
 import 'package:omnichannel_flutter/common/colors/Colors.dart';
 import 'package:omnichannel_flutter/common/fonts/FontSize.dart';
 import 'package:omnichannel_flutter/common/ui/BaseScreen.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/Export.dart';
 import 'package:omnichannel_flutter/modals/home-modals.dart';
 import "package:collection/collection.dart";
@@ -16,6 +17,7 @@ import 'package:omnichannel_flutter/modules/export/bloc/ExportState.dart';
 import 'package:omnichannel_flutter/modules/home/screens/createExportScreen/createExportScreen.dart';
 import 'package:omnichannel_flutter/modules/home/screens/export/widget/exportItem.dart';
 import 'package:omnichannel_flutter/utis/date.dart';
+import 'package:omnichannel_flutter/widgets/FullScreenLoading/main.dart';
 
 class ExportScreen extends BaseScreenStateful {
   static final theme =
@@ -60,27 +62,35 @@ class ExportScreenState extends State<ExportScreen>
           child: Column(
             children: <Widget>[
               InkWell(
-                  onTap:() {
-                    BlocProvider.of<ExportBloc>(context).add(ExportEventCancelExport(id));
+                  onTap: () {
+                    BlocProvider.of<ExportBloc>(context)
+                        .add(ExportEventCancelExport(id));
                     Navigator.pop(context);
                   },
                   child: Padding(
                     padding: EdgeInsets.all(10),
                     child: Text(
                       'Hủy phiếu',
-                      style: TextStyle(color: Colors.red, fontSize: FontSize.big),
+                      style:
+                          TextStyle(color: Colors.red, fontSize: FontSize.big),
                     ),
                   )),
               InkWell(
                   child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text('Tạo bản sao', style: TextStyle(fontSize: FontSize.big),),
-                  )),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Tạo bản sao',
+                  style: TextStyle(fontSize: FontSize.big),
+                ),
+              )),
               InkWell(
                   child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text('In mã vạch', style: TextStyle(fontSize: FontSize.big),),
-                  )),
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'In mã vạch',
+                  style: TextStyle(fontSize: FontSize.big),
+                ),
+              )),
             ],
           ),
         ),
@@ -125,7 +135,7 @@ class ExportScreenState extends State<ExportScreen>
               },
               description: item.stock.name,
               status: item.status.toString(),
-              quantity: item.items.length,
+              quantity: item.items.fold(0, (t, element) => t + element.qty),
               createByName: item.createdByUser.displayName,
               idExport: item.itemId.toString(),
               warehouseName: item.stock.name,
@@ -142,12 +152,12 @@ class ExportScreenState extends State<ExportScreen>
 
   @override
   Widget build(BuildContext context) {
-    /// app chưa có willpop
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: AppColors.sage,
         child: Icon(Icons.add),
-        onPressed: () => Navigator.pushNamed(context, "/createExport", arguments: CreateImportExportType.EXPORT),
+        onPressed: () => Navigator.pushNamed(context, "/createExport",
+            arguments: CreateImportExportType.EXPORT),
       ),
       body: WillPopScope(
         onWillPop: () {
@@ -156,6 +166,9 @@ class ExportScreenState extends State<ExportScreen>
         child: BlocBuilder<ExportBloc, ExportState>(
           builder: (context, state) {
             if (state.exports.items.length == 0) {
+              if (state.status == Status.loading) {
+                return FullScreenLoading();
+              }
               return Center(
                 child: Padding(
                   padding: EdgeInsets.only(left: 30, right: 30, top: 90),
@@ -185,11 +198,14 @@ class ExportScreenState extends State<ExportScreen>
                 padding: EdgeInsets.only(top: 15),
                 color: Color(0xffEFF4F7),
                 child: RefreshIndicator(
-                  onRefresh: () async => BlocProvider.of<ExportBloc>(context).add(ExportEventPaging()),
+                  onRefresh: () async => BlocProvider.of<ExportBloc>(context)
+                      .add(ExportEventPaging()),
                   child: CustomScrollView(
                     controller: controllerExportData,
                     // slivers: _listTitle.map((title) => buildSection(title, _dataExportShow[title])).toList(),
-                    slivers: _buildSectionList(state.exports.items),
+                    slivers: [
+                      ..._buildSectionList(state.exports.items),
+                    ],
                   ),
                 ),
               );

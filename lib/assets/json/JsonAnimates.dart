@@ -6,4 +6,5 @@ class JsonAnimates {
   static const add = 'lib/assets/json/add.json';
   static const loading = 'lib/assets/json/loading.json';
   static const loadingV2 = 'lib/assets/json/loadingV2.json';
+  static const loadingCircles = 'lib/assets/json/9419-loading-circles.json';
 }

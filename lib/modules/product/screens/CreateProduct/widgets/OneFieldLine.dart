@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 
 class OneFieldLine extends StatefulWidget {
   const OneFieldLine(
-      {this.hint, this.onChanged, this.onSubmitted, this.isClearOnSubmit = false});
+      {this.hint, this.onChanged, this.initialValue = '', this.onSubmitted, this.isClearOnSubmit = false});
 
   final String hint;
   final Function(String) onChanged;
+  final String initialValue;
   final Function(String) onSubmitted;
   final bool isClearOnSubmit;
 
@@ -25,13 +26,13 @@ class _State extends State<OneFieldLine> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 10),
-      child: TextField(
-        controller: _textController,
+      child: TextFormField(
+        controller: _textController..text = widget.initialValue,
         decoration: InputDecoration(labelText: widget.hint),
         onChanged: (text) {
           widget.onChanged?.call(text);
         },
-        onSubmitted: (text) {
+        onFieldSubmitted: (text) {
           if (widget.isClearOnSubmit) {
             _textController.clear();
           }

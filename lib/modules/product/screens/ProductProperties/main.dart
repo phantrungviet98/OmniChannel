@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,35 +36,40 @@ class ProductProperties extends BaseScreenStateful {
   }
 }
 
-class _State extends State<ProductProperties> {
+class _State extends State<ProductProperties> with AfterLayoutMixin {
   List<Variants> _variants = [];
   List<ProductAttributesInput> _attributes = [];
+
+  @override
+  void initState() {
+    _variants = BlocProvider.of<CreateProductBloc>(context).state.createProductInput.variants;
+    _attributes = BlocProvider.of<CreateProductBloc>(context).state.createProductInput.attributes;
+    super.initState();
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+  }
 
   _openCreateCateForm(BuildContext context) {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
-        final bloc = BlocProvider.of<CreateProductBloc>(context);
         return CreatePropertiesDialog(
           onDone: (props) {
             _attributes.add(ProductAttributesInput(
                 name: props.first.name,
                 values: props.map((e) => e.value).toList()));
-            _buildVariantsFromAttributes(_attributes, ProductPropertiesDefault(
-              weight: bloc.state.createProductInput.weight,
-              price: bloc.state.createProductInput.price,
-              inPrice: bloc.state.createProductInput.inPrice,
-              salePrice: bloc.state.createProductInput.salePrice,
-            ));
+            _buildVariantsFromAttributes(_attributes);
           },
         );
       },
     );
   }
 
-  _buildVariantsFromAttributes(List<ProductAttributesInput> attributes,
-      ProductPropertiesDefault screenParams) {
+  _buildVariantsFromAttributes(List<ProductAttributesInput> attributes) {
+    final data = BlocProvider.of<CreateProductBloc>(context).state.createProductInput;
     List<List<ProductVariantsAttributesInput>> a = _attributes
         .map((e) => e.values
             .map(
@@ -83,10 +89,10 @@ class _State extends State<ProductProperties> {
     final variants = _allPossibleCases
         .map((e) => Variants(
             attributes: List.from(e),
-            weight: screenParams.weight,
-            price: screenParams.price,
-            inPrice: screenParams.inPrice,
-            salePrice: screenParams.salePrice))
+            weight: data.weight,
+            price: data.price,
+            inPrice: data.inPrice,
+            salePrice: data.salePrice))
         .toList();
 
     setState(() {
@@ -101,13 +107,6 @@ class _State extends State<ProductProperties> {
     var remainder = cloned.isNotEmpty ? allPossibleCases(cloned) : [[]];
     for (var r in remainder) for (var h in first) yield [h, ...r];
   }
-
-  // Iterable<List<String>> allPossibleCasesString(List<List<String>> list) sync* {
-  //   List<List<String>> cloned = List.from(list);
-  //   var first = cloned.removeAt(0);
-  //   var remainder = cloned.isNotEmpty ? allPossibleCasesString(cloned) : [[]];
-  //   for (var r in remainder) for (var h in first) yield [h, ...r];
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -153,8 +152,7 @@ class _State extends State<ProductProperties> {
                                 setState(() => this._attributes = values);
                                 _buildVariantsFromAttributes(
                                     values,
-                                    ModalRoute.of(context).settings.arguments
-                                        as ProductPropertiesDefault);
+                                );
                               },
                             )
                           : Container(),

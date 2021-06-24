@@ -1,35 +1,24 @@
 import 'package:equatable/equatable.dart';
+import 'package:omnichannel_flutter/constant/Status.dart';
 import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 
-abstract class CategoryState extends Equatable {
-  const CategoryState();
-}
+class CategoryState extends Equatable {
+  const CategoryState({this.allCate});
+  final AllCate allCate;
 
-class CategoryStateInitial extends CategoryState {
-  const CategoryStateInitial();
-
-  @override
-  List<Object> get props => [];
-}
-
-class CategoryStateGetAllLoading extends CategoryState {
-  const CategoryStateGetAllLoading();
-
-  @override
-  List<Object> get props => [];
-}
-
-class CategoryStateGetAllFail extends CategoryState {
-  const CategoryStateGetAllFail();
-
-  @override
-  List<Object> get props => [];
-}
-
-class CategoryStateGetAllSuccess extends CategoryState {
-  const CategoryStateGetAllSuccess({this.allCate});
-  final List<Cats> allCate;
+  CategoryState copyWith({AllCate allCate}) => CategoryState(allCate: allCate ?? this.allCate);
 
   @override
   List<Object> get props => [allCate];
+}
+
+class AllCate extends Equatable {
+  const AllCate({this.status, this.data});
+  final Status status;
+  final List<Cats> data;
+  AllCate copyWith({Status status, List<Cats> data}) =>
+      AllCate(
+          status: status ?? this.status, data: data ?? this.data);
+  @override
+  List<Object> get props => [status, data];
 }

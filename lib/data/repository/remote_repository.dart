@@ -62,6 +62,38 @@ class RemoteRepository {
     }
   }
 
+  static Future<ProductsPaging> getProductsPaging(
+      int page, perPage, FilterFindManyProductInput filter) async {
+    try {
+      final result =
+          await PosServiceConfigs.client.query(QueryOptions(document: gql('''
+        query productsPaging(\$page: Int!, \$perPage: Int!, \$filter: FilterFindManyProductInput) {
+                product {
+                    productsPaging(page: \$page, perPage: \$perPage, filter: \$filter, sort: ID_DESC) {
+                        count,
+                        items {
+                            _id, brand_id, id, name, price, in_price, sale_price, date_created, featured_photo { _id, url },
+                            variants { id, price, barcode, weight, sale_price, in_price, attributes { name, value } },
+                            photos { _id, url },
+                            stockData {
+                                total, qty_by_stock, qty_by_variant
+                            }
+                        },
+                        pageInfo {
+                            pageCount,
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+      '''), variables: {'page': page, 'perPage': perPage, 'filter': filter}));
+
+      return ProductsPaging.fromJson(result.data['product']['productsPaging']);
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static Future<Either<Failure, bool>> createProduct(
       CreateOneProductInput input) async {
     try {
@@ -69,6 +101,61 @@ class RemoteRepository {
       return Right(true);
     } on ServerException catch (e) {
       return Left(ServerFailure());
+    }
+  }
+
+  static Future<Product> getProductDetail(String id) async {
+    try {
+      final result =
+          await PosServiceConfigs.client.query(QueryOptions(document: gql('''
+        query productById(\$_id: MongoID!) {
+                product {
+                    productById(_id: \$_id) {
+                        _id, id, name, price, desc, weight, in_price, sale_price, cat_ids, brand_id, tag_ids, cats { _id, name }, brand { _id, name }, tags { _id, name }, men, women, boy, girl, is_active, 
+                        featured_photo {
+                            _id, url
+                        },
+                        date_created,
+                        created_by_user {
+                            display_name
+                        }, photo_ids,
+                        photos { _id, url },
+                        variants {
+                            id, weight, price, in_price, sale_price, barcode, attributes { name, value }
+                        },
+                        attributes { name, values }
+                    }
+                }
+            }
+      '''), variables: {'_id': id}, fetchPolicy: FetchPolicy.cacheAndNetwork));
+      return Product.fromJson(result.data['product']['productById']);
+    } catch (e) {
+      log('getProductDetail' + e.toString());
+      return null;
+    }
+  }
+
+  static Future<bool> updateProduct(String id, CreateOneProductInput data) async {
+    try {
+      final result = await PosServiceConfigs.client.mutate(MutationOptions(document: gql('''
+        mutation update(\$record:UpdateOneProductInput!, \$filter: FilterUpdateOneProductInput) {
+                product {
+                  updateProduct(record: \$record, filter: \$filter) {
+                    recordId,
+                    record {
+                        _id
+                    }
+                  }
+                }
+            }
+      '''), variables: {'record': data, 'filter': {'_id': id}}));
+
+      log(result.toString());
+
+      return result.data['product']['updateProduct']['record']['_id'] != null;
+    } catch (e) {
+      log('updateProduct' + e.toString());
+      return false;
     }
   }
 
@@ -111,8 +198,6 @@ class RemoteRepository {
             }
           }  
       '''), fetchPolicy: FetchPolicy.cacheAndNetwork));
-
-      log(result.toString());
 
       List<Stock> list = List.from(
           result.data['stock']['stocks']?.map((e) => Stock.fromJson(e)));
@@ -390,9 +475,11 @@ class RemoteRepository {
     }
   }
 
-  static Future<bool> createImport(CreateOneStockImportExportInput record) async {
+  static Future<bool> createImport(
+      CreateOneStockImportExportInput record) async {
     try {
-      final result = await PosServiceConfigs.client.mutate(MutationOptions(document: gql('''
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
         mutation (\$record:CreateOneStockImportInput!) {
                 stock {
                     createImport(record: \$record) {
@@ -410,9 +497,11 @@ class RemoteRepository {
     }
   }
 
-  static Future<bool> createExport(CreateOneStockImportExportInput record) async {
+  static Future<bool> createExport(
+      CreateOneStockImportExportInput record) async {
     try {
-      final result = await PosServiceConfigs.client.mutate(MutationOptions(document: gql('''
+      final result = await PosServiceConfigs.client
+          .mutate(MutationOptions(document: gql('''
         mutation (\$record:CreateOneStockExportInput!) {
                 stock {
                     createExport(record: \$record) {

@@ -33,7 +33,7 @@ class LocationPicker extends StatelessWidget {
       padding: EdgeInsets.only(top: 12),
       child: DropdownButton(
           icon: status == Status.loading
-              ? Lottie.asset(JsonAnimates.loadingV2, width: 32, height: 32)
+              ? Lottie.asset(JsonAnimates.loadingCircles, height: 30)
               : null,
           isExpanded: true,
           value: data.isNotEmpty ? code : null,

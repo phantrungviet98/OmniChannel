@@ -2,18 +2,74 @@ import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter_tags/flutter_tags.dart';
+import 'package:omnichannel_flutter/data/modals/Export.dart';
+import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 import 'package:omnichannel_flutter/utis/number.dart';
 
+class FilterFindManyProductInput extends Equatable {
+  const FilterFindManyProductInput({this.nameRegex});
+
+  final String nameRegex;
+
+  Map<String, dynamic> toJson() => {
+        "nameRegex": nameRegex,
+      };
+
+  @override
+  List<Object> get props => [nameRegex];
+}
+
+class ProductsPaging extends Equatable {
+  ProductsPaging({
+    this.count,
+    this.items,
+    this.pageInfo,
+  });
+
+  final int count;
+  final List<Product> items;
+  final PageInfo pageInfo;
+
+  ProductsPaging copyWith({
+    int count,
+    List<Product> items,
+    PageInfo pageInfo,
+  }) =>
+      ProductsPaging(
+        count: count ?? this.count,
+        items: items ?? this.items,
+        pageInfo: pageInfo ?? this.pageInfo,
+      );
+
+  factory ProductsPaging.fromJson(Map<String, dynamic> json) => ProductsPaging(
+        count: json["count"],
+        items:
+            List<Product>.from(json["items"].map((x) => Product.fromJson(x))),
+        pageInfo: PageInfo.fromJson(json["pageInfo"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "count": count,
+        "items": List<dynamic>.from(items.map((x) => x.toJson())),
+        "pageInfo": pageInfo.toJson(),
+      };
+
+  @override
+  List<Object> get props => [count, items, pageInfo];
+}
+
 class Product extends Equatable {
+  int productId;
   String id;
   String name;
-  Null desc;
+  String desc;
   double price;
-  Null inPrice;
+  int inPrice;
   int salePrice;
   int weight;
   List<String> catIds;
-  Null brandId;
+  String brandId;
   List<String> tagIds = [];
   bool men;
   bool women;
@@ -23,8 +79,8 @@ class Product extends Equatable {
   List<Attributes> attributes = [];
   String createdBy;
   int dateCreated;
-  Null dateUpdated;
-  Null updatedBy;
+  int dateUpdated;
+  String updatedBy;
   List<String> photoIds;
   bool isActive;
   FeaturedPhoto featuredPhoto;
@@ -32,11 +88,12 @@ class Product extends Equatable {
   List<dynamic> tags = [];
   List<Photo> photos = [];
   CreatedByUser createdByUser;
-  Null brand;
+  ProductBrand brand;
   List<Cats> cats = [];
 
   Product(
-      {this.id,
+      {this.productId,
+      this.id,
       this.name,
       this.desc,
       this.price,
@@ -68,6 +125,7 @@ class Product extends Equatable {
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
+    productId = json['id'];
     name = json['name'];
     desc = json['desc'];
     price = jsonToDouble(json['price']);
@@ -120,7 +178,7 @@ class Product extends Equatable {
     createdByUser = json['created_by_user'] != null
         ? new CreatedByUser.fromJson(json['created_by_user'])
         : null;
-    brand = json['brand'];
+    brand = ProductBrand.fromJson(json['brand']);
     if (json['cats'] != null) {
       json['cats'].forEach((v) {
         cats.add(new Cats.fromJson(v));
@@ -130,6 +188,7 @@ class Product extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.productId;
     data['_id'] = this.id;
     data['name'] = this.name;
     data['desc'] = this.desc;
@@ -171,7 +230,7 @@ class Product extends Equatable {
     if (this.createdByUser != null) {
       data['created_by_user'] = this.createdByUser.toJson();
     }
-    data['brand'] = this.brand;
+    data['brand'] = this.brand?.toJson();
     if (this.cats != null) {
       data['cats'] = this.cats.map((v) => v.toJson()).toList();
     }
@@ -212,6 +271,26 @@ class Product extends Equatable {
       ];
 }
 
+class ProductBrand extends Equatable {
+  const ProductBrand({this.id, this.name});
+
+  final String id;
+  final String name;
+
+  factory ProductBrand.fromJson(Map<String, dynamic> json) =>
+      json != null ? ProductBrand(id: json['_id'], name: json['name']) : null;
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = id;
+    data['name'] = name;
+    return data;
+  }
+
+  @override
+  List<Object> get props => [id, name];
+}
+
 class ProductStock {
   int total;
   dynamic qtyByStock;
@@ -230,7 +309,7 @@ class Variants {
   int id;
   int weight;
   int price;
-  Null inPrice;
+  int inPrice;
   int salePrice;
   String barcode;
   List<Attributes> attributes = [];
@@ -275,24 +354,33 @@ class Variants {
 
 class Attributes extends Equatable {
   String name;
+
+  // Maybe wrong
   String value;
 
-  Attributes({this.name, this.value});
+  List<String> values;
+
+  Attributes({this.name, this.value, this.values});
 
   Attributes.fromJson(Map<String, dynamic> json) {
     name = json['name'];
-    value = json['value'];
+    if (json['value'] != null) {
+      value = json['value'];
+    } else {
+      values = json['values'].cast<String>();
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
     data['value'] = this.value;
+    data['values'] = this.values.cast<String>();
     return data;
   }
 
   @override
-  List<Object> get props => [name, value];
+  List<Object> get props => [name, value, values];
 }
 
 class FeaturedPhoto {
@@ -357,34 +445,6 @@ class CreatedByUser {
     data['user_role'] = this.userRole;
     data['is_active'] = this.isActive;
     data['date_created'] = this.dateCreated;
-    return data;
-  }
-}
-
-class Cats {
-  String name;
-  Null parentId;
-  List<String> ancestorIds = [];
-
-  Cats({this.name, this.parentId, this.ancestorIds});
-
-  Cats.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    parentId = json['parent_id'];
-    if (json['ancestor_ids'] != null) {
-      json['ancestor_ids'].forEach((v) {
-        ancestorIds.add(v);
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['parent_id'] = this.parentId;
-    if (this.ancestorIds != null) {
-      data['ancestor_ids'] = this.ancestorIds.map((v) => v).toList();
-    }
     return data;
   }
 }

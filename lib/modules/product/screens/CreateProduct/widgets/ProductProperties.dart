@@ -7,8 +7,8 @@ import 'package:omnichannel_flutter/modules/product/bloc/CreateProduct/CreatePro
 import 'package:omnichannel_flutter/modules/product/screens/ProductProperties/main.dart';
 
 class ProductProperties extends StatefulWidget {
-  const ProductProperties({
-      this.onAttributeChange});
+  const ProductProperties({this.onAttributeChange});
+
   final Function(ProductPropertiesChangedParams) onAttributeChange;
 
   @override
@@ -29,39 +29,46 @@ class _State extends State<ProductProperties> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CreateProductBloc, CreateProductState>(builder: (context, state) => Column(
-      children: [
-        Text(
-          'Thuộc tính sản phẩm',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-            () {
-          if (state.createProductInput.attributes.isEmpty) {
-            return TextFormField(
-              focusNode: _focusNode..unfocus(),
-              onTap: _onPress,
-              decoration: InputDecoration(
-                  hintText: 'Thêm thuộc tính sản phẩm của bạn ở đây',
-                  icon: Icon(
-                    Icons.edit,
-                    color: AppColors.sage,
-                  )),
-            );
-          } else {
-            return Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: _onPress,
-                    child: Text('Dữ liệu đã được cập nhật', style: TextStyle(color: AppColors.languidLavender),),
-                  )
-                ],
-              ),
-            );
-          }
-        }(),
-      ],
-    ),);
+    return BlocBuilder<CreateProductBloc, CreateProductState>(
+      builder: (context, state) => Column(
+        children: [
+          Text(
+            'Thuộc tính sản phẩm',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          () {
+            if (state.createProductInput.attributes.isEmpty) {
+              return TextFormField(
+                focusNode: _focusNode..unfocus(),
+                onTap: _onPress,
+                decoration: InputDecoration(
+                    hintText: 'Thêm thuộc tính sản phẩm của bạn ở đây',
+                    icon: Icon(
+                      Icons.edit,
+                      color: AppColors.sage,
+                    )),
+              );
+            } else {
+              return Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: _onPress,
+                      child: Text(
+                        state.createProductInput.attributes
+                            .map((e) => e.name + ': ' + e.values.join(', '))
+                            .join('\n'),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }
+          }(),
+        ],
+      ),
+    );
   }
 }

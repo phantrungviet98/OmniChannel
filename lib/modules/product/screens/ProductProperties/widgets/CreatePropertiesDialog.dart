@@ -18,13 +18,6 @@ class CreatePropertiesDialog extends StatefulWidget {
   }
 }
 
-// class _Properties {
-//   const _Properties({this.name, this.value});
-//
-//   final String name;
-//   final String value;
-// }
-
 class _State extends State<CreatePropertiesDialog> {
   final _nameInputController = TextEditingController();
   final _valueInputController = TextEditingController();

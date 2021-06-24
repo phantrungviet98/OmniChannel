@@ -1,5 +1,6 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:equatable/equatable.dart';
+import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 
 class CreateOneProductInput extends Equatable {
   String name;
@@ -18,6 +19,8 @@ class CreateOneProductInput extends Equatable {
   List<String> tagNames;
   List<Variants> variants;
   List<String> photoUrls;
+  List<Cats> cats = [];
+  String brandName;
 
   CreateOneProductInput({
     this.name,
@@ -36,6 +39,8 @@ class CreateOneProductInput extends Equatable {
     this.tagNames,
     this.variants,
     this.photoUrls,
+    this.cats,
+    this.brandName,
   });
 
   static final empty = () => CreateOneProductInput(
@@ -54,7 +59,8 @@ class CreateOneProductInput extends Equatable {
       girl: false,
       photoIds: [],
       photoUrls: [],
-      salePrice: null
+      salePrice: null,
+      brandName: '',
   );
 
   CreateOneProductInput.fromJson(Map<String, dynamic> json) {
@@ -89,6 +95,12 @@ class CreateOneProductInput extends Equatable {
         variants.add(new Variants.fromJson(v));
       });
     }
+    if (json['cats'] != null) {
+      json['cats'].forEach((v) {
+        cats.add(new Cats.fromJson(v));
+      });
+    }
+    brandName = json['brand_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -115,6 +127,7 @@ class CreateOneProductInput extends Equatable {
     if (this.variants != null) {
       data['variants'] = this.variants.map((v) => v.toJson()).toList();
     }
+    data['brand_name'] = this.brandName;
     return data;
   }
 
@@ -174,6 +187,7 @@ extension CreateOneProductInputCopyWith on CreateOneProductInput {
     List<ProductAttributesInput> attributes,
     bool boy,
     List<String> catIds,
+    List<Cats> cats,
     String desc,
     bool girl,
     double inPrice,
@@ -192,6 +206,7 @@ extension CreateOneProductInputCopyWith on CreateOneProductInput {
       attributes: attributes ?? this.attributes,
       boy: boy ?? this.boy,
       catIds: catIds ?? this.catIds,
+      cats: cats ?? this.cats,
       desc: desc ?? this.desc,
       girl: girl ?? this.girl,
       inPrice: inPrice ?? this.inPrice,
