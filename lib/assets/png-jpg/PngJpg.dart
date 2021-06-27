@@ -6,4 +6,7 @@ class PngJpg {
   static const ic_face = 'lib/assets/png-jpg/ic_facebook.png';
   static const ic_tiktok = 'lib/assets/png-jpg/ic_tiktok.png';
   static const ic_insta = 'lib/assets/png-jpg/ic_insta.png';
+  static const ic_clear_text = 'lib/assets/png-jpg/ic_clear_text.png';
+  static const ic_search = 'lib/assets/png-jpg/ic_search.png';
+  static const ic_close = 'lib/assets/png-jpg/ic_close.png';
 }

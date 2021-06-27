@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:omnichannel_flutter/modules/home/screens/createExportScreen/widget/normal_text_input.dart';
+import 'package:omnichannel_flutter/normal_dialog_list/normal_dialog_list.dart';
 
 class createOrderScreen extends StatefulWidget {
   @override
@@ -13,15 +14,22 @@ class createOrderScreenState extends State<createOrderScreen> {
   List<String> _listStyleSell = ["Bán tại cửa hàng", "Giao hàng thu hộ", "Giao hàng ứng tiền"];
   List<String> _listStyleShip = ["Người mua nhận hàng", "Giao hàng cho người khác"];
   List<String> _listWareHouse = ["Kho 1", "Kho 2", "Kho 3"];
-  List<String> _listItem = ["Mũ", "Áo sơ mi", "Giày", "Quần"];
+  List<String> _listDistrict = ["Ha Noi", "TPHCM", "Da Nang"];
+  List<String> _listHuyen = ["Hoang Mai", "Hai Ba Trung", "Cau Giay"];
+  List<String> _listXa = ["Hien Luong", "Ha Hoa", "Vinh Tuy"];
+  List<String> _listItem = ["Mũ", "Áo sơ mi", "Giày", "Quần","abcsad","dasasd",'ahsdasd',"asdasda","asdadsasd","qweqweqwe","qwewrqeqwe","asdasdasd"];
   TextEditingController discountController = new TextEditingController();
+  TextEditingController placeController = new TextEditingController();
   TextEditingController firstPayController = new TextEditingController();
+  TextEditingController secondPayController = new TextEditingController();
+  TextEditingController thirdPayController = new TextEditingController();
   TextEditingController styleController = new TextEditingController();
   TextEditingController _phoneNumberController = new TextEditingController();
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _receverNumber = new TextEditingController();
   TextEditingController _receverName = new TextEditingController();
-  TextEditingController _placeController = new TextEditingController();
+  TextEditingController _storeNoteController = new TextEditingController();
+  TextEditingController _customerNoteContro = new TextEditingController();
   TextEditingController quantityController = new TextEditingController();
   TextEditingController _ = new TextEditingController();
   String errPhone = null;
@@ -34,7 +42,11 @@ class createOrderScreenState extends State<createOrderScreen> {
   String _wareHouse = "";
   String _styleSell = "";
   String _item = "";
+  String _district = "";
   String _styleShip = "";
+  String _huyen ="";
+  String _xa ="";
+  String _place ="";
   File _image;
 
   ///sẽ có một trường giá khi cọn sản phẩm cái này ghép API các bạn xử lý nhé mình fix tạm giá ntn
@@ -42,12 +54,35 @@ class createOrderScreenState extends State<createOrderScreen> {
   int price = 3000000;
   final picker = ImagePicker();
 
+  _onPressListItem() {
+    FocusScope.of(context).unfocus();
+    List<String> listData = [];
+    if (_listItem != null && _listItem.length > 0) {
+      _listItem.forEach((bf) {
+        listData.add(bf);
+      });
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return NormalDialogListBank(
+              title: 'Chọn san pham',
+              listData: listData,
+              onSelectedItem: _onChangeItem,
+              selectedData: _item != null ? _item : null,
+            );
+          });
+    }
+  }
+
   void initState() {
     super.initState();
     _wareHouse = _listWareHouse[0];
     _item = _listItem[0];
     _styleSell = _listStyleSell[0];
     _styleShip = _listStyleShip[0];
+    _district = _listDistrict[0];
+    _huyen = _listHuyen[0];
+    _xa = _listXa[0];
     quantityController.text = 1.toString();
   }
 
@@ -68,11 +103,28 @@ class createOrderScreenState extends State<createOrderScreen> {
       _styleShip = value;
     });
   }
-
-  _onChangeItem(String value) {
+  _onChangeDistrict(String value) {
     setState(() {
-      _item = value;
-      quantityController.text = 1.toString();
+      _district = value;
+    });
+  }
+
+  _onChangeItem(String item) {
+    setState(() {
+
+      _item = item;
+    });
+  }
+  _onChangeXa(String item) {
+    setState(() {
+
+      _xa = item;
+    });
+  }
+  _onChangeHuyen(String item) {
+    setState(() {
+
+      _huyen = item;
     });
   }
 
@@ -167,16 +219,104 @@ class createOrderScreenState extends State<createOrderScreen> {
                   ],
                 )
               : SizedBox.shrink(),
+          Text(
+            "Tinh/Thanh Pho",
+            style: TextStyle(color: Colors.grey),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          DropdownButton(
+            isExpanded: true,
+            underline: Divider(height: 0, thickness: 1.5, color: Colors.grey),
+            value: _district,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+            ),
+            items: _listDistrict.map((item) {
+              return DropdownMenuItem(
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                value: item,
+              );
+            }).toList(),
+            onChanged: _onChangeDistrict,
+          ),
+          SizedBox(height: 10,),
+          Text(
+            "Quan/Huyen",
+            style: TextStyle(color: Colors.grey),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          DropdownButton(
+            isExpanded: true,
+            underline: Divider(height: 0, thickness: 1.5, color: Colors.grey),
+            value: _huyen,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+            ),
+            items: _listHuyen.map((item) {
+              return DropdownMenuItem(
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                value: item,
+              );
+            }).toList(),
+            onChanged: _onChangeHuyen,
+          ),
+          SizedBox(height: 10,),
+          Text(
+            "Xa/Phuong/Thi Tran",
+            style: TextStyle(color: Colors.grey),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          DropdownButton(
+            isExpanded: true,
+            underline: Divider(height: 0, thickness: 1.5, color: Colors.grey),
+            value: _xa,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
+            ),
+            items: _listXa.map((item) {
+              return DropdownMenuItem(
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                value: item,
+              );
+            }).toList(),
+            onChanged: _onChangeXa,
+          ),
+          SizedBox(height: 10,),
           NormalTextInput(
             onChanged: (text) {
-              setState(() {
-                errNameRecever = null;
-              });
+
             },
             color: Colors.black,
-            errorText: errNameRecever,
+          //  errorText: errPhoneRecever,
             fontSize: 16,
-            controller: _placeController,
+            controller: placeController,
             keyboardType: TextInputType.name,
             hintText: ("Địa chỉ"),
             hintTextFontSize: 14,
@@ -288,8 +428,10 @@ class createOrderScreenState extends State<createOrderScreen> {
     var discount = int.parse(discountController.text);
     assert(discount is int);
     var firstPay = int.parse(firstPayController.text);
-    assert(firstPay is int);
-    var lastPrice = price - discount - firstPay;
+    assert(firstPay is int); var secondPay = int.parse(secondPayController.text);
+    assert(secondPay is int); var thirdPay = int.parse(thirdPayController.text);
+    assert(thirdPay is int);
+    var lastPrice = price - discount - firstPay-secondPay-thirdPay;
 
     ///chỗ này các bạn tự validate nhé
     Dialog dialog = Dialog(
@@ -433,42 +575,46 @@ class createOrderScreenState extends State<createOrderScreen> {
                 hintTextFontSize: 14,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Chọn sản phẩm",
-                style: TextStyle(color: Colors.grey),
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              DropdownButton(
-                isExpanded: true,
-                underline: Divider(height: 0, thickness: 1.5, color: Colors.grey),
-                value: _item,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
-                items: _listItem.map((item) {
-                  return DropdownMenuItem(
-                    child: Text(
-                      item,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                    value: item,
-                  );
-                }).toList(),
-                onChanged: _onChangeItem,
-              ),
+
               SizedBox(
                 height: 10,
               ),
               (_styleSell != _listStyleSell[0]) ? infoCustomer() : SizedBox.shrink(),
+              SizedBox(
+                height: 10,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'San pham',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: _onPressListItem,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text(_item ?? 'Chọn san pham',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: _item != null ? Colors.black : Colors.grey,
+                                    fontWeight: FontWeight.w500)),
+                          ),
+                          Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Divider(height: 0, thickness: 1.2, color: Colors.grey),
+                ],
+              ),
               Text(
                 "Chọn kho xuất hàng",
                 style: TextStyle(color: Colors.grey),
@@ -504,7 +650,7 @@ class createOrderScreenState extends State<createOrderScreen> {
               NormalTextInput(
                 onChanged: (text) {
                   setState(() {
-                    errText = null;
+                    quantityErr = null;
                   });
                 },
                 color: Colors.black,
@@ -537,24 +683,89 @@ class createOrderScreenState extends State<createOrderScreen> {
               SizedBox(
                 height: 10,
               ),
+
               NormalTextInput(
                 onChanged: (text) {
                   setState(() {
-                    quantityErr = null;
+                  //  quantityErr = null;
                   });
                 },
                 color: Colors.black,
-                errorText: quantityErr,
+             //   errorText: quantityErr,
                 fontSize: 16,
                 controller: firstPayController,
                 keyboardType: TextInputType.number,
-                hintText: ("Đã thanh toán trước"),
+                hintText: ("Chuyển khoản"),
                 hintTextFontSize: 14,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
               ),
               SizedBox(
                 height: 10,
               ),
+              NormalTextInput(
+                onChanged: (text) {
+                  setState(() {
+                //    quantityErr = null;
+                  });
+                },
+                color: Colors.black,
+              //  errorText: quantityErr,
+                fontSize: 16,
+                controller: secondPayController,
+                keyboardType: TextInputType.number,
+                hintText: ("Đã quẹt thẻ"),
+                hintTextFontSize: 14,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              NormalTextInput(
+                onChanged: (text) {
+                  setState(() {
+           //         quantityErr = null;
+                  });
+                },
+                color: Colors.black,
+              //  errorText: quantityErr,
+                fontSize: 16,
+                controller: thirdPayController,
+                keyboardType: TextInputType.number,
+                hintText: ("Hình thức khác"),
+                hintTextFontSize: 14,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              NormalTextInput(
+                onChanged: (text) {
+
+                },
+                color: Colors.black,
+                //  errorText: errPhoneRecever,
+                fontSize: 16,
+                controller: _storeNoteController,
+                keyboardType: TextInputType.name,
+                hintText: ("Ghi chú nội bộ"),
+                hintTextFontSize: 14,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              SizedBox(height:10),
+              NormalTextInput(
+                onChanged: (text) {
+
+                },
+                color: Colors.black,
+                //  errorText: errPhoneRecever,
+                fontSize: 16,
+                controller: _customerNoteContro,
+                keyboardType: TextInputType.name,
+                hintText: ("Ghi chú khách "),
+                hintTextFontSize: 14,
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              SizedBox(height:10),
               Row(
                 children: [
                   Text(
