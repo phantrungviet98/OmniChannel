@@ -1,16 +1,29 @@
+import 'package:after_layout/after_layout.dart';
 import "package:collection/collection.dart";
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:intl/intl.dart';
 import 'package:omnichannel_flutter/assets/png-jpg/PngJpg.dart';
+import 'package:omnichannel_flutter/common/colors/Colors.dart';
+import 'package:omnichannel_flutter/data/modals/Order.dart';
 import 'package:omnichannel_flutter/model/orderData.dart';
 import 'package:omnichannel_flutter/modules/home/screens/listOrderScreen/widget/orderItem.dart';
+import 'package:omnichannel_flutter/modules/order/bloc/OrderBloc.dart';
+import 'package:omnichannel_flutter/modules/order/bloc/OrderEvent.dart';
+import 'package:omnichannel_flutter/modules/order/bloc/OrderState.dart';
+import 'package:omnichannel_flutter/utis/date.dart';
+import 'package:omnichannel_flutter/widgets/CustomAppBar/main.dart';
+
+final formatCurrency = new NumberFormat("#,##0.00", "en_US");
 
 class ListOrderScreen extends StatefulWidget {
   @override
   ListOrderScreenState createState() => ListOrderScreenState();
 }
 
-class ListOrderScreenState extends State<ListOrderScreen> {
+class ListOrderScreenState extends State<ListOrderScreen>
+    with AfterLayoutMixin {
   List<OrderData> _listOderData = [];
   List<String> _listTitle = [];
   Map<dynamic, List<OrderData>> _dataOrderToShow;
@@ -21,13 +34,11 @@ class ListOrderScreenState extends State<ListOrderScreen> {
     _callApi();
   }
 
-  ///hàm này sẽ dùng khi có API sau
   void afterFirstLayout(BuildContext context) {
-    // TODO: implement afterFirstLayout
+    // BlocProvider.of<OrderBloc>(context).add(OrdersPagingEvent(type: OrdersPagingType.refresh));
     _callApi();
   }
 
-  /// sau này sẽ call API ở dây tạm thời mình fix call API cần async await
   _callApi() {
     OrderData order1 = new OrderData(
         orderId: "DH100",
@@ -94,20 +105,17 @@ class ListOrderScreenState extends State<ListOrderScreen> {
     _listOderData.add(order2);
     _listOderData.add(order4);
 
-    _generateSectionList(_listOderData);
+    // _generateSectionList(_listOderData);
   }
 
-  ///hàm này để group lại dữ liệu theo ngày tháng
-  _generateSectionList(List<OrderData> listOrderData) {
-    _listTitle.clear();
-    _dataOrderToShow = groupBy(listOrderData, (OrderData e) {
-      return e.createAt;
-    });
-    if (_dataOrderToShow != null) {
-      _dataOrderToShow.forEach((key, value) {
-        _listTitle.add(key);
-      });
-    }
+  _buildSectionList(List<Order> data) {
+    final a = groupBy(
+        data,
+        (Order e) => convertMilisecToDateTimeReadable(
+            e.dateCreated, DateFormat('dd/MM/yyyy')));
+    final List<Widget> b = [];
+    a.forEach((key, value) => b.add(buildSection(key, value)));
+    return b;
   }
 
   onRefreshData() async {
@@ -117,10 +125,41 @@ class ListOrderScreenState extends State<ListOrderScreen> {
     _callApi();
   }
 
-  Widget buildSection(String title, List<OrderData> listOrderData) {
+  _showBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.3),
+        decoration: BoxDecoration(
+          color: AppColors.bone,
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+        ),
+        child: Column(
+          children: [
+            InkWell(
+              child: Text('Xác nhận đơn'),
+              onTap: () {},
+            ),
+            InkWell(
+              child: Text('Sửa đơn'),
+              onTap: () {},
+            ),
+            InkWell(
+              child: Text('Tạo bản sao'),
+              onTap: () {},
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSection(String title, List<Order> listOrderData) {
     return SliverStickyHeader(
       header: Container(
-        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+        padding: const EdgeInsets.all(16),
         color: Color(0xffEFF4F7),
         child: Row(
           children: [
@@ -143,18 +182,18 @@ class ListOrderScreenState extends State<ListOrderScreen> {
           (context, index) {
             var item = listOrderData[index];
             return OrderItem(
-              /// để mở ra màn detail
-              onPress: () async {
-                print("ok");
-              },
-              amount: item.totalAmount.toString(),
-              description: item.description,
+              key: Key(item.id),
+              onPress: () async {},
+              onPressOption: () => _showBottomSheet(context),
+              amount: formatCurrency.format(item.cod),
+              description: convertCardItemsToDescription(item.cartItems),
               status: item.status,
-              sellOn: item.sellOn,
-              quantity: item.totalItem,
-              createByName: item.createByName,
-              idExport: item.orderId,
-              warehouseName: item.warehouseName,
+              sellOn: item.conversationId != null ? 'FB' : null,
+              idExport: item.itemId.toString(),
+              dateCreated: convertMilisecToDateTimeReadable(
+                  item.dateCreated, DateFormat('dd/MM/yyyy')),
+              name: item.customerName,
+              phoneNumber: item.phoneNumber,
             );
           },
           childCount: listOrderData.length,
@@ -163,78 +202,75 @@ class ListOrderScreenState extends State<ListOrderScreen> {
     );
   }
 
-  Widget buildListData() {
-    return Container(
-      margin: EdgeInsets.only(top: 15),
-      color: Color(0xffEFF4F7),
-      child: RefreshIndicator(
-        onRefresh: onRefreshData,
-        child: CustomScrollView(
-          controller: controllerOrderData,
-          slivers: _listTitle.map((title) => buildSection(title, _dataOrderToShow[title])).toList(),
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<OrderBloc>(
+      create: (context) => OrderBloc(),
+      child: Scaffold(
+        appBar: CustomAppBar(
+          title: 'Danh sách đơn hàng',
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.sage,
+          child: Icon(Icons.add),
+          onPressed: () async {
+            final result = await Navigator.pushNamed(context, "/createOrder");
+            if (result == true) {
+              onRefreshData();
+            }
+          },
+        ),
+        body: WillPopScope(
+          onWillPop: () {
+            Navigator.pop(context, true);
+          },
+          child: BlocBuilder<OrderBloc, OrderState>(
+            builder: (context, state) => _listOderData.length == 0
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 30, right: 30, top: 90),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            PngJpg.imgNullData,
+                            width: 150,
+                            height: 150,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "Chưa có đơn hàng",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Container(
+                    //margin: EdgeInsets.only(top: 15),
+                    color: Color(0xffEFF4F7),
+                    child: CustomScrollView(
+                      controller: controllerOrderData,
+                      slivers: _buildSectionList(state.ordersPaging.data.items),
+                    ),
+                  ),
+          ),
         ),
       ),
     );
   }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    /// app chưa có willpop
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        centerTitle: true,
-        title: Text("Danh sách đơn hàng"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurpleAccent,
-        child: Icon(Icons.add),
-        onPressed: () async {
-          final result = await Navigator.pushNamed(context, "/createOrder");
-          if (result == true) {
-            onRefreshData();
-          }
-        },
-      ),
-      body: WillPopScope(
-        onWillPop: () {
-          Navigator.pop(context, true);
-        },
-        child: _listOderData.length == 0
-            ? Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 30, right: 30, top: 90),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        PngJpg.imgNullData,
-                        width: 150,
-                        height: 150,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "Chưa có đơn hàng",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            : Container(
-          padding: EdgeInsets.only(top: 15),
-                //margin: EdgeInsets.only(top: 15),
-                color: Color(0xffEFF4F7),
-                child: CustomScrollView(
-                  controller: controllerOrderData,
-                  slivers: _listTitle.map((title) => buildSection(title, _dataOrderToShow[title])).toList(),
-                ),
-              ),
-      ),
-    );
+extension Helper on ListOrderScreenState {
+  String convertCardItemsToDescription(List<CartItem> cartItems) {
+    return cartItems
+        .map((e) =>
+            e.productName +
+            e.attributes.map((e) => '${e.name}: ${e.value}').join(', '))
+        .join('; ');
   }
 }

@@ -12,6 +12,7 @@ import 'package:omnichannel_flutter/data/modals/GetAllCateResponse.dart';
 import 'package:omnichannel_flutter/data/modals/Location.dart';
 import 'package:omnichannel_flutter/data/modals/LoginResponse.dart';
 import 'package:omnichannel_flutter/data/modals/ManagementProductResponse.dart';
+import 'package:omnichannel_flutter/data/modals/Order.dart';
 import 'package:omnichannel_flutter/data/modals/Stock.dart';
 import 'package:omnichannel_flutter/data/services/auth_service.dart';
 import 'package:omnichannel_flutter/data/services/pos_service.dart';
@@ -243,7 +244,6 @@ class RemoteRepository {
           variables: {
             'filter': FilterFindManyDistrictInput(cityCode: cityCode).toJson()
           }));
-      log(result.toString());
       return List.from(result.data['location']['districts']
           ?.map((e) => District.fromJson(e)));
     } catch (e) {
@@ -510,12 +510,48 @@ class RemoteRepository {
                   }
               }
       '''), variables: {'record': record.toJson()}));
-
-      log('ress123123213' + result.toString());
-
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  static Future<OrdersPaging> getOrdersPaging(int page, int perPage) async {
+    try {
+      final result = await PosServiceConfigs.client
+          .query(QueryOptions(document: gql('''
+            query fetchItems(\$page: Int!, \$perPage: Int!) {
+                order {
+                  ordersPaging(page: \$page, perPage: \$perPage, sort: ID_DESC) {
+                    count,
+                    items {
+                        _id, 
+                        id, minetype,
+                        customer_name, phone_number, 
+                        amount, COD, total_weight,
+                        status,
+                        stock_id,
+                        shipping_partner_id,
+                        date_created,
+                        conversation_id,
+                        chanel_id,
+                        cart_items {
+                            product_id_ref, qty, price, weight, product_name, attributes { name, value }
+                        },
+                        address, city_code, district_code, ward_code, ward {label}, city {label}, district {label},
+                        shipping_code, shipping_fee { fee }
+                    },
+                    pageInfo {
+                      pageCount,
+                      hasNextPage
+                    }
+                  }
+                }
+            }
+          '''), variables: {'page': page, 'perPage': perPage}));
+      return OrdersPaging.fromJson(result.data['order']['ordersPaging']);
+    } catch (e) {
+      log('getOrdersPaging' + e.toString());
     }
   }
 }
